@@ -2,8 +2,7 @@ package logico;
 
 public class Vacuna {
 	private String id;
-	private String nombre;
-	
+	private String nombre; // nombre vacuna
 	public Vacuna(String id, String nombre) {
 		super();
 		this.id = id;
