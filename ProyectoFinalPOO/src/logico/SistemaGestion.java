@@ -6,7 +6,7 @@ public class SistemaGestion {
 	private ArrayList<Medico> listaMedicos;
 	private ArrayList<Cita> listaCitas;
 	private ArrayList<Enfermedad> catalogoEnfermedades;
-	private ArrayList<Vacuna> catalogoVacunas;
+	private ArrayList<Vacuna> catalogoVacunas; // vacunas
 	
 	public SistemaGestion() {
 		super();

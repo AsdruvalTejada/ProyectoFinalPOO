@@ -2,7 +2,7 @@ package logico;
 
 public class Enfermedad {
 	private String id;
-	private String nombre;
+	private String nombre; // nombre enfermedad
 	private Boolean estaBajoVigilancia;
 	
 	public Enfermedad(String id, String nombre, Boolean estaBajoVigilancia) {
