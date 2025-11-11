@@ -58,6 +58,21 @@ public class SistemaGestion {
 	public void agregarVacuna(Vacuna vac) {
 		catalogoVacunas.add(vac);
 	}
+	public Cita buscarCitaPorId(String idCita) {
+		Cita aux = null;
+		boolean encontrado = false;
+		int i = 0;
+		while(!encontrado && i < listaCitas.size()) {
+			if(listaCitas.get(i).getId().equalsIgnoreCase(idCita)) {
+				aux = listaCitas.get(i);
+				encontrado = true;
+			}
+			i++;
+			
+		}
+		
+		return aux;
+	}
 	
 	
 
