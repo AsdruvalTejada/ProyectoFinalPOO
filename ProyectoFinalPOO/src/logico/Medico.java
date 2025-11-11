@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-public class Medico {
+public class Medico extends Persona {
 	
 	private String especialidad;
     private int limiteCitasPorDia;
@@ -16,16 +16,7 @@ public class Medico {
     private ArrayList<TurnoJornada> horarioFijo;
     private ArrayList<BloqueoAgenda> exceptHorario;
     
-	public Medico(String especialidad, int limiteCitasPorDia, int duracionCitaMinutos, ArrayList<Cita> agenda,
-			ArrayList<TurnoJornada> horarioFijo, ArrayList<BloqueoAgenda> exceptHorario) {
-		super();
-		this.especialidad = especialidad;
-		this.limiteCitasPorDia = 10;
-		this.duracionCitaMinutos = 30;
-		this.agenda = agenda;
-		this.horarioFijo = horarioFijo;
-		this.exceptHorario = exceptHorario;
-	}
+	
 
 	public String getEspecialidad() {
 		return especialidad;
