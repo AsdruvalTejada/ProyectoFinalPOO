@@ -1,8 +1,9 @@
 package logico;
 
 public class Enfermedad {
+	
 	private String id;
-	private String nombre; // nombre enfermedad
+	private String nombre; 
 	private Boolean estaBajoVigilancia;
 	
 	public Enfermedad(String id, String nombre, Boolean estaBajoVigilancia) {
@@ -29,6 +30,5 @@ public class Enfermedad {
 	public void setEstaBajoVigilancia(Boolean estaBajoVigilancia) {
 		this.estaBajoVigilancia = estaBajoVigilancia;
 	}
-	
-	
+		
 }
