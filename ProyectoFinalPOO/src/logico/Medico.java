@@ -16,7 +16,17 @@ public class Medico extends Persona {
     private ArrayList<TurnoJornada> horarioFijo;
     private ArrayList<BloqueoAgenda> exceptHorario;
     
-	
+	public Medico(String id, String name, String apellido, LocalDate fechaNacimiento, String sexo, String contacto,
+			String especialidad, int limiteCitasPorDia, int duracionCitaMinutos, ArrayList<Cita> agenda,
+			ArrayList<TurnoJornada> horarioFijo, ArrayList<BloqueoAgenda> exceptHorario) {
+		super(id, name, apellido, fechaNacimiento, sexo, contacto);
+		this.especialidad = especialidad;
+		this.limiteCitasPorDia = 10;
+		this.duracionCitaMinutos = 30;
+		this.agenda = agenda;
+		this.horarioFijo = horarioFijo;
+		this.exceptHorario = exceptHorario;
+	}
 
 	public String getEspecialidad() {
 		return especialidad;
@@ -102,7 +112,7 @@ public class Medico extends Persona {
 	    LocalDate diaBuscado = fechaHora.toLocalDate();
 	    int contadorCitasDia = 0;
 	    for (Cita citaEnAgenda : this.agenda) {
-	        if (citaEnAgenda.getFechaHora().toLocalDate().isEqual(diaBuscado)) {
+	        if (citaEnAgenda.getFechaCitada().toLocalDate().isEqual(diaBuscado)) {
 	            contadorCitasDia++;
 	        }
 	    }
@@ -110,7 +120,7 @@ public class Medico extends Persona {
 
 	    boolean chocaConCita = false; 
 	    for (Cita citaEnAgenda : this.agenda) {
-	        LocalDateTime inicioCitaExistente = citaEnAgenda.getFechaHora();
+	        LocalDateTime inicioCitaExistente = citaEnAgenda.getFechaCitada();
 	        LocalDateTime finCitaExistente = inicioCitaExistente.plusMinutes(this.duracionCitaMinutos);
 
 	        boolean haySolapamiento = fechaHora.isBefore(finCitaExistente) && 
