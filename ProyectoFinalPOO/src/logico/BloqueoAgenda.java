@@ -3,7 +3,7 @@ package logico;
 import java.time.LocalDateTime;
 
 public class BloqueoAgenda {
-
+	//
 	private LocalDateTime fechaHoraInicio;
     private LocalDateTime fechaHoraFin;
     private String motivo;
