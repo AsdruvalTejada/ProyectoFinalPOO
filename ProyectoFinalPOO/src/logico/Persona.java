@@ -1,5 +1,6 @@
 package logico;
 import java.time.LocalDate;
+import java.time.Period;
 
 public abstract class Persona {
 	protected String id; 
@@ -62,4 +63,15 @@ public abstract class Persona {
 	public String getId() {
 		return id;
 	} 
+	
+	public String getNombreCompleto() {
+		return this.name + " " + this.apellido;
+	}
+	
+	public int getEdad() {
+		if (this.fechaNacimiento == null) {
+			return 0;
+		}
+		return Period.between(this.fechaNacimiento, LocalDate.now()).getYears();
+	}
 }	
