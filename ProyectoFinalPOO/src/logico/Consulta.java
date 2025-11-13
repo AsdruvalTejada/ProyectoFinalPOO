@@ -3,96 +3,113 @@ package logico;
 import java.time.LocalDateTime;
 
 public class Consulta {
-	private String id;
-	private Cita citaAsociada;
-	private Paciente paciente;
-	private Medico medico;
-	private LocalDateTime fechaConsulta;
-	private String sintomas;
-	private Enfermedad diagnostico;
-	private String tratamiento;
-	private boolean esImportante;
-	
-	public Consulta(String id, Cita citaAsociada, Paciente paciente, Medico medico, LocalDateTime fechaConsulta, String sintomas,
-			Enfermedad diagnostico, String tratamiento, boolean esImportante) {
-		super();
-		this.id = id;
-		this.citaAsociada = citaAsociada;
-		this.paciente = paciente;
-		this.medico = medico;
-		this.fechaConsulta = fechaConsulta;
-		this.sintomas = sintomas;
-		this.diagnostico = diagnostico;
-		this.tratamiento = tratamiento;
-		this.esImportante = esImportante;
-	}
 
-	public Cita getCitaAsociada() {
-		return citaAsociada;
-	}
+    private String id;
+    private Cita citaAsociada;
+    private Paciente paciente;
+    private Medico medico;
+    private LocalDateTime fechaConsulta;
+    private String sintomas;
+    private Enfermedad diagnostico;
+    private String tratamiento;
+    private boolean esImportanteParaResumen; 
 
-	public void setCitaAsociada(Cita citaAsociada) {
-		this.citaAsociada = citaAsociada;
-	}
+    public Consulta(String id, Cita citaAsociada, Paciente paciente, Medico medico, LocalDateTime fechaConsulta, String sintomas) {
+        super();
+        this.id = id;
+        this.citaAsociada = citaAsociada;
+        this.paciente = paciente;
+        this.medico = medico;
+        this.fechaConsulta = fechaConsulta;
+        this.sintomas = sintomas;
+        this.diagnostico = null;
+        this.tratamiento = "";
+        this.esImportanteParaResumen = false;
+    }
 
-	public Paciente getPaciente() {
-		return paciente;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setPaciente(Paciente paciente) {
-		this.paciente = paciente;
-	}
+    public Cita getCitaAsociada() {
+        return citaAsociada;
+    }
 
-	public Medico getMedico() {
-		return medico;
-	}
+    public void setCitaAsociada(Cita citaAsociada) {
+        this.citaAsociada = citaAsociada;
+    }
 
-	public void setMedico(Medico medico) {
-		this.medico = medico;
-	}
+    public Paciente getPaciente() {
+        return paciente;
+    }
 
-	public LocalDateTime getFechaConsulta() {
-		return fechaConsulta;
-	}
+    public void setPaciente(Paciente paciente) {
+        this.paciente = paciente;
+    }
 
-	public void setFechaConsulta(LocalDateTime fechaConsulta) {
-		this.fechaConsulta = fechaConsulta;
-	}
+    public Medico getMedico() {
+        return medico;
+    }
 
-	public String getSintomas() {
-		return sintomas;
-	}
+    public void setMedico(Medico medico) {
+        this.medico = medico;
+    }
 
-	public void setSintomas(String sintomas) {
-		this.sintomas = sintomas;
-	}
+    public LocalDateTime getFechaConsulta() {
+        return fechaConsulta;
+    }
 
-	public Enfermedad getDiagnostico() {
-		return diagnostico;
-	}
+    public void setFechaConsulta(LocalDateTime fechaConsulta) {
+        this.fechaConsulta = fechaConsulta;
+    }
 
-	public void setDiagnostico(Enfermedad diagnostico) {
-		this.diagnostico = diagnostico;
-	}
+    public String getSintomas() {
+        return sintomas;
+    }
 
-	public String getTratamiento() {
-		return tratamiento;
-	}
+    public void setSintomas(String sintomas) {
+        this.sintomas = sintomas;
+    }
 
-	public void setTratamiento(String tratamiento) {
-		this.tratamiento = tratamiento;
-	}
+    public Enfermedad getDiagnostico() {
+        return diagnostico;
+    }
 
-	public boolean isEsImportante() {
-		return esImportante;
-	}
+    public void setDiagnostico(Enfermedad diagnostico) {
+        this.diagnostico = diagnostico;
+    }
 
-	public void setEsImportante(boolean esImportante) {
-		this.esImportante = esImportante;
-	}
+    public String getTratamiento() {
+        return tratamiento;
+    }
 
-	public String getId() {
-		return id;
-	}
-	
+    public void setTratamiento(String tratamiento) {
+        this.tratamiento = tratamiento;
+    }
+
+    public boolean isEsImportanteParaResumen() {
+        return this.esImportanteParaResumen; 
+    }
+
+    public void setEsImportanteParaResumen(boolean esImportanteParaResumen) {
+        this.esImportanteParaResumen = esImportanteParaResumen;
+    }
+    
+    public void finalizarConsulta(Enfermedad diagnostico, String tratamiento, boolean esImportanteParaResumen) {
+        this.diagnostico = diagnostico;
+        this.tratamiento = tratamiento;
+        this.esImportanteParaResumen = esImportanteParaResumen;
+    }
+
+    public boolean esVisiblePara(Medico medico) {
+        if (this.medico.equals(medico)) {
+            return true;
+        }
+
+        if (this.diagnostico != null && this.diagnostico.getEstaBajoVigilancia()) {
+            return true;
+        }
+
+        return false;
+    }
 }
