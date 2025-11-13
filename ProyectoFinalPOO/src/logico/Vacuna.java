@@ -4,6 +4,7 @@ public class Vacuna {
 
 	private String id;
 	private String nombre;
+	
 	public Vacuna(String id, String nombre) {
 		super();
 		this.id = id;

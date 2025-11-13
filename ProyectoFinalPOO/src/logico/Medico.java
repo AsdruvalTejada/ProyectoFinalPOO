@@ -79,6 +79,12 @@ public class Medico extends Persona {
 	public void definirLimiteCitas(int limite) {
         this.limiteCitasPorDia = limite;
     }
+	public void agregarEnAgenda(Cita ag) {
+		agenda.add(ag);
+	}
+	public void liberarAgenda(Cita ag) {
+		agenda.remove(ag);
+	}
 	
 
 	public boolean estaDisponible(LocalDateTime fechaHora) {
