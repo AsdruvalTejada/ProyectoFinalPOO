@@ -1,5 +1,4 @@
 package logico;
-
 import java.time.LocalDate;
 
 public abstract class Persona {
@@ -63,5 +62,4 @@ public abstract class Persona {
 	public String getId() {
 		return id;
 	} 
-	
-}
+}	

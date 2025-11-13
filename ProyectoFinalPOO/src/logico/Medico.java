@@ -1,13 +1,13 @@
 package logico;
 
-
+//
 import java.util.ArrayList;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-public class Medico extends Persona{
+public class Medico extends Persona {
 	
 	private String especialidad;
     private int limiteCitasPorDia;
@@ -17,7 +17,8 @@ public class Medico extends Persona{
     private ArrayList<BloqueoAgenda> exceptHorario;
     
 	public Medico(String id, String name, String apellido, LocalDate fechaNacimiento, String sexo, String contacto,
-			String especialidad, int limiteCitasPorDia, int duracionCitaMinutos) {
+			String especialidad, int limiteCitasPorDia, int duracionCitaMinutos, ArrayList<Cita> agenda,
+			ArrayList<TurnoJornada> horarioFijo, ArrayList<BloqueoAgenda> exceptHorario) {
 		super(id, name, apellido, fechaNacimiento, sexo, contacto);
 		this.especialidad = especialidad;
 		this.limiteCitasPorDia = limiteCitasPorDia;

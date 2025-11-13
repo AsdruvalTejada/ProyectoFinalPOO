@@ -90,7 +90,7 @@ public class Login extends JFrame {
                     txtPassword.setText("");
                 }
             }
-        });        
+        });//        
         btnEntrar.setBounds(160, 130, 100, 30);
         contentPane.add(btnEntrar);
     }
