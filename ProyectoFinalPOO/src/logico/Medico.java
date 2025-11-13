@@ -85,7 +85,7 @@ public class Medico extends Persona {
 	public void liberarAgenda(Cita ag) {
 		agenda.remove(ag);
 	}
-	
+	// ola2
 
 	public boolean estaDisponible(LocalDateTime fechaHora) {
 
