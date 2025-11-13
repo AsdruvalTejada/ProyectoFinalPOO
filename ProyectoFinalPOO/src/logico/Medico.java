@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-public class Medico {
+public class Medico extends Persona{
 	
 	private String especialidad;
     private int limiteCitasPorDia;
@@ -16,17 +16,17 @@ public class Medico {
     private ArrayList<TurnoJornada> horarioFijo;
     private ArrayList<BloqueoAgenda> exceptHorario;
     
-	public Medico(String especialidad, int limiteCitasPorDia, int duracionCitaMinutos, ArrayList<Cita> agenda,
-			ArrayList<TurnoJornada> horarioFijo, ArrayList<BloqueoAgenda> exceptHorario) {
-		super();
+	public Medico(String id, String name, String apellido, LocalDate fechaNacimiento, String sexo, String contacto,
+			String especialidad, int limiteCitasPorDia, int duracionCitaMinutos) {
+		super(id, name, apellido, fechaNacimiento, sexo, contacto);
 		this.especialidad = especialidad;
-		this.limiteCitasPorDia = 10;
-		this.duracionCitaMinutos = 30;
-		this.agenda = agenda;
-		this.horarioFijo = horarioFijo;
-		this.exceptHorario = exceptHorario;
+		this.limiteCitasPorDia = limiteCitasPorDia;
+		this.duracionCitaMinutos = duracionCitaMinutos;
+		agenda = new ArrayList<>();
+		horarioFijo = new ArrayList<>();
+		exceptHorario = new ArrayList<>();
 	}
-
+	
 	public String getEspecialidad() {
 		return especialidad;
 	}
@@ -132,4 +132,5 @@ public class Medico {
 	    
 	    return enTurnoFijo && !chocaConBloqueo && !limiteAlcanzado && !chocaConCita;
 	}
+
 }
