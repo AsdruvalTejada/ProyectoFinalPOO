@@ -111,7 +111,7 @@ public class Medico {
 	    LocalDate diaBuscado = fechaHora.toLocalDate();
 	    int contadorCitasDia = 0;
 	    for (Cita citaEnAgenda : this.agenda) {
-	        if (citaEnAgenda.getFechaHora().toLocalDate().isEqual(diaBuscado)) {
+	        if (citaEnAgenda.getFechaCitada().toLocalDate().isEqual(diaBuscado)) {
 	            contadorCitasDia++;
 	        }
 	    }
@@ -119,7 +119,7 @@ public class Medico {
 
 	    boolean chocaConCita = false; 
 	    for (Cita citaEnAgenda : this.agenda) {
-	        LocalDateTime inicioCitaExistente = citaEnAgenda.getFechaHora();
+	        LocalDateTime inicioCitaExistente = citaEnAgenda.getFechaCitada();
 	        LocalDateTime finCitaExistente = inicioCitaExistente.plusMinutes(this.duracionCitaMinutos);
 
 	        boolean haySolapamiento = fechaHora.isBefore(finCitaExistente) && 
