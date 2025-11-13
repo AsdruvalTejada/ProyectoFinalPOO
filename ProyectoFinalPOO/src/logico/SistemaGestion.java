@@ -92,6 +92,7 @@ public class SistemaGestion {
 	}
 	public void agregarCita(Cita cita) {
 		listaCitas.add(cita);
+		genIdCita++;
 	}
 	public void registrarPaciente(Paciente pac) {
 		listaPacientes.add(pac);
@@ -151,8 +152,8 @@ public class SistemaGestion {
 		if(med != null) {
 			
 			if(med.estaDisponible(horarioMed)) {
-				aux = new Cita("C-"+genIdCita, idVisitante, nombreVisitante, med, horarioMed, "pendiente");
 				agregarCita(aux);
+				aux = new Cita("C-"+genIdCita, idVisitante, nombreVisitante, med, horarioMed, "pendiente");
 				med.agregarEnAgenda(aux);
 			}
 		}
@@ -161,13 +162,10 @@ public class SistemaGestion {
 	}
 	public void cancelarCita(String idCita) {
 		Cita citaAux = buscarCitaPorId(idCita);
-		if(citaAux != null) {
-			if(citaAux.getFechaCitada().isAfter(LocalDateTime.now())) {
-				citaAux.setEstado("cancelada");
-				citaAux.getMedico().liberarAgenda(citaAux);
-			}		
+		if(citaAux != null && citaAux.citaPuedeCancelarse()) {
+			citaAux.setEstado("cancelada");
+			citaAux.getMedico().liberarAgenda(citaAux);		
 		}
 	}
-	// ola
 }
 
