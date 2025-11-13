@@ -3,7 +3,7 @@ package logico;
 import java.time.LocalTime;
 
 public class TurnoJornada {
-	
+	//
 	private String diaSemana;
     private LocalTime horaInicio;
     private LocalTime horaFin;
