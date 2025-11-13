@@ -1,5 +1,6 @@
 package logico;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 //
 public class Cita {
@@ -62,6 +63,13 @@ public class Cita {
 
 	public String getId() {
 		return id;
+	}
+	public boolean citaPuedeCancelarse() {
+		boolean valido = false;
+		if(this.getFechaCitada().isAfter(LocalDateTime.now())) {
+			valido = true;
+		}
+		return valido;
 	}
 	
 }
