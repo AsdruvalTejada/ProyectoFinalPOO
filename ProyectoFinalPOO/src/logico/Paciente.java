@@ -10,6 +10,9 @@ public class Paciente extends Persona{
 	
 	public Paciente(String id, String name, String apellido, LocalDate fechaNacimiento, String sexo, String contacto) {
 		super(id, name, apellido, fechaNacimiento, sexo, contacto);
+		
+		historialConsultas = new ArrayList<>();
+		registroVacunacion = new HashMap<>();
 	}
 
 	public ArrayList<Consulta> getHistorialConsultas() {
@@ -28,4 +31,4 @@ public class Paciente extends Persona{
 		this.registroVacunacion = registroVacunacion;
 	}
 	
-}
+}	
