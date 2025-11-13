@@ -13,7 +13,7 @@ public class Usuario {
         this.rol = rol;
         this.idUser = idUser;
     }
-
+//
     public String getUsername() {
         return username;
     }
