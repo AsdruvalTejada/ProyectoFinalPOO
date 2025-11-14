@@ -138,5 +138,18 @@ public class Medico extends Persona {
 	    
 	    return enTurnoFijo && !chocaConBloqueo && !limiteAlcanzado && !chocaConCita;
 	}
+	public ArrayList<Consulta> verHistorialPaciente(Paciente paciente){
+		
+		ArrayList<Consulta> historial = paciente.getHistorialConsultas();
+		ArrayList<Consulta> listaHistorial = new ArrayList<>();
+		
+		for(Consulta consulta: historial) {
+			if(consulta.esVisiblePara(this)) {
+				listaHistorial.add(consulta);
+			}
+		}
+		
+		return listaHistorial;
+	}
 
 }
