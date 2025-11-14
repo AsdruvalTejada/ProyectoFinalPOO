@@ -1,6 +1,7 @@
 package logico;
 import java.util.ArrayList;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class SistemaGestion {
 	private ArrayList<Paciente> listaPacientes;
@@ -12,6 +13,7 @@ public class SistemaGestion {
 	private ArrayList<Secretaria> listaSecretarias;
 	private static SistemaGestion clinica = null;
 	public static int genIdCita = 0;
+	public static int genIdConsulta = 0;
 
 	private SistemaGestion() {
 		super();
@@ -146,7 +148,19 @@ public class SistemaGestion {
 		}
 		return aux;
 	}
-	
+	public Consulta buscarConsultaPorId(String idConsulta) {
+		for(Paciente paciente: listaPacientes) {
+			ArrayList <Consulta> hisConsul = paciente.getHistorialConsultas();
+			
+			for(Consulta consulta: hisConsul) {
+				if(consulta.getId().equalsIgnoreCase(idConsulta)) {
+					return consulta;
+				}
+					
+			}
+		}
+		return null;
+	}
 	public Secretaria buscarSecretariaPorId(String idSecretaria) {
 	    Secretaria aux = null;
 	    boolean encontrado = false;
@@ -197,6 +211,58 @@ public class SistemaGestion {
 	    } else {
 	        return null;
 	    }
+	}
+	public Consulta iniciarConsulta(String idCita, String apellido, LocalDate fechaNacimiento, String sexo, String contacto, String sintomas) {
+		Consulta ConAux = null;
+		Cita citaAux = buscarCitaPorId(idCita);
+		if(citaAux != null){
+			Paciente pac = buscarPacientePorId(citaAux.getIdPaciente());
+			if(pac == null){
+				pac = new Paciente(citaAux.getIdPaciente(), citaAux.getNameVisitante(), apellido, fechaNacimiento, sexo, contacto);
+				pac.inicializarRegistroVacunas(this.catalogoVacunas);
+				registrarPaciente(pac);
+				
+				ConAux  = new Consulta("Co-"+genIdConsulta++, citaAux, pac, citaAux.getMedico(), LocalDateTime.now(), sintomas);
+				citaAux.setEstado("completada");
+				pac.agregarConsulta(ConAux);
+			}
+			else {
+				ConAux  = new Consulta("Co-"+genIdConsulta++, citaAux, pac, citaAux.getMedico(), LocalDateTime.now(), sintomas);
+				citaAux.setEstado("completada");
+				pac.agregarConsulta(ConAux);
+			}
+		}
+		return ConAux;
+	}
+	public boolean modificarCita(String idCita, LocalDateTime nuevaFecha, Medico nuevoMedico) {
+		Cita cita = buscarCitaPorId(idCita);
+		boolean realizado = false;
+		
+		if(cita != null) {
+			if(cita.citaPuedeCancelarse()) {
+				if(nuevoMedico.estaDisponible(nuevaFecha)) {
+					cita.getMedico().liberarAgenda(cita);
+					cita.setFechaCitada(nuevaFecha);
+					cita.setMedico(nuevoMedico);
+					nuevoMedico.agregarEnAgenda(cita);
+					realizado = true;
+				}
+			}
+		}
+		return realizado;
+	}
+	public boolean finalizarConsulta(String idConsulta, Enfermedad diagnostico, String tratamiento, boolean esImportante, ArrayList <Vacuna>vacunasAplicadas) {
+		boolean finalizado = false;
+		Consulta consulta = buscarConsultaPorId(idConsulta);
+		if(consulta != null) {
+			consulta.finalizarConsulta(diagnostico, tratamiento, esImportante);
+			for(Vacuna vacuna: vacunasAplicadas) {
+				consulta.getPaciente().marcarVacunaAplicada(vacuna);
+			}
+			finalizado = true;
+		}
+		
+		return finalizado;
 	}
 }
 
