@@ -78,13 +78,13 @@ public class Medico extends Persona {
 	public void definirLimiteCitas(int limite) {
         this.limiteCitasPorDia = limite;
     }
+	
 	public void agregarEnAgenda(Cita ag) {
 		agenda.add(ag);
 	}
 	public void liberarAgenda(Cita ag) {
 		agenda.remove(ag);
 	}
-	// ola2
 
 	public boolean estaDisponible(LocalDateTime fechaHora) {
 
@@ -138,6 +138,7 @@ public class Medico extends Persona {
 	    
 	    return enTurnoFijo && !chocaConBloqueo && !limiteAlcanzado && !chocaConCita;
 	}
+	
 	public ArrayList<Consulta> verHistorialPaciente(Paciente paciente){
 		
 		ArrayList<Consulta> historial = paciente.getHistorialConsultas();
@@ -151,5 +152,14 @@ public class Medico extends Persona {
 		
 		return listaHistorial;
 	}
-
+	
+	public void addBloqueoHorario(LocalDateTime inicio, LocalDateTime fin, String motivo) {
+		BloqueoAgenda bloqueoAniadido = new BloqueoAgenda(inicio, fin, motivo);
+		this.exceptHorario.add(bloqueoAniadido);
+	}
+	
+	public void addTurnoJornada(String dia, LocalTime inicio, LocalTime fin) {
+		TurnoJornada turnoAniadido = new TurnoJornada(dia, inicio, fin);
+		this.horarioFijo.add(turnoAniadido);
+	}
 }

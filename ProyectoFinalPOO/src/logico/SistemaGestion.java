@@ -5,7 +5,6 @@ import java.util.Map;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.Comparator; 
-import java.util.Collections;
 
 public class SistemaGestion {
 	private ArrayList<Paciente> listaPacientes;
@@ -122,7 +121,7 @@ public class SistemaGestion {
 				encontrado = true;
 			}
 			i++;
-			
+
 		}		
 		return aux;
 	}
@@ -155,42 +154,42 @@ public class SistemaGestion {
 	public Consulta buscarConsultaPorId(String idConsulta) {
 		for(Paciente paciente: listaPacientes) {
 			ArrayList <Consulta> hisConsul = paciente.getHistorialConsultas();
-			
+
 			for(Consulta consulta: hisConsul) {
 				if(consulta.getId().equalsIgnoreCase(idConsulta)) {
 					return consulta;
 				}
-					
+
 			}
 		}
 		return null;
 	}
 	public Secretaria buscarSecretariaPorId(String idSecretaria) {
-	    Secretaria aux = null;
-	    boolean encontrado = false;
-	    int i = 0;
-	    while(!encontrado && i < listaSecretarias.size()) { 
-	        if(listaSecretarias.get(i).getId().equalsIgnoreCase(idSecretaria)) {
-	            aux = listaSecretarias.get(i);
-	            encontrado = true;
-	        }
-	        i++;
-	    }
-	    return aux;
+		Secretaria aux = null;
+		boolean encontrado = false;
+		int i = 0;
+		while(!encontrado && i < listaSecretarias.size()) { 
+			if(listaSecretarias.get(i).getId().equalsIgnoreCase(idSecretaria)) {
+				aux = listaSecretarias.get(i);
+				encontrado = true;
+			}
+			i++;
+		}
+		return aux;
 	}
-	
+
 	public Cita crearCita(String idVisitante, String nombreVisitante,String idMedico, LocalDateTime horarioMed) {
 		Cita aux = null;
 		Medico med = buscarMedicoPorId(idMedico);
 		if(med != null) {
-			
+
 			if(med.estaDisponible(horarioMed)) {
 				agregarCita(aux);
 				aux = new Cita("C-"+genIdCita, idVisitante, nombreVisitante, med, horarioMed, "pendiente");
 				med.agregarEnAgenda(aux);
 			}
 		}
-		
+
 		return aux;
 	}
 	public void cancelarCita(String idCita) {
@@ -200,21 +199,21 @@ public class SistemaGestion {
 			citaAux.getMedico().liberarAgenda(citaAux);		
 		}
 	}
-	
+
 	public Medico getMedicoLogueado(Usuario user) {
-	    if (user != null && user.getRol().equalsIgnoreCase("MEDICO")) {
-	        return buscarMedicoPorId(user.getIdPersonaVinculada());
-	    } else {
-	        return null;
-	    }
+		if (user != null && user.getRol().equalsIgnoreCase("MEDICO")) {
+			return buscarMedicoPorId(user.getIdPersonaVinculada());
+		} else {
+			return null;
+		}
 	}
-	
+
 	public Secretaria getSecretariaLogueada(Usuario user) {
-	    if (user != null && user.getRol().equalsIgnoreCase("SECRETARIA")) {
-	        return buscarSecretariaPorId(user.getIdPersonaVinculada());
-	    } else {
-	        return null;
-	    }
+		if (user != null && user.getRol().equalsIgnoreCase("SECRETARIA")) {
+			return buscarSecretariaPorId(user.getIdPersonaVinculada());
+		} else {
+			return null;
+		}
 	}
 	public Consulta iniciarConsulta(String idCita, String apellido, LocalDate fechaNacimiento, String sexo, String contacto, String sintomas) {
 		Consulta ConAux = null;
@@ -225,7 +224,7 @@ public class SistemaGestion {
 				pac = new Paciente(citaAux.getIdPaciente(), citaAux.getNameVisitante(), apellido, fechaNacimiento, sexo, contacto);
 				pac.inicializarRegistroVacunas(this.catalogoVacunas);
 				registrarPaciente(pac);
-				
+
 				ConAux  = new Consulta("Co-"+genIdConsulta++, citaAux, pac, citaAux.getMedico(), LocalDateTime.now(), sintomas);
 				citaAux.setEstado("completada");
 				pac.agregarConsulta(ConAux);
@@ -241,7 +240,7 @@ public class SistemaGestion {
 	public boolean modificarCita(String idCita, LocalDateTime nuevaFecha, Medico nuevoMedico) {
 		Cita cita = buscarCitaPorId(idCita);
 		boolean realizado = false;
-		
+
 		if(cita != null) {
 			if(cita.citaPuedeCancelarse()) {
 				if(nuevoMedico.estaDisponible(nuevaFecha)) {
@@ -265,15 +264,15 @@ public class SistemaGestion {
 			}
 			finalizado = true;
 		}
-		
+
 		return finalizado;
 	}
 	public HashMap<Enfermedad, Integer>getReporteEnfermedades(){
 		HashMap<Enfermedad, Integer> contEnfermedades = new HashMap<>();
-		
+
 		for(Paciente paciente: listaPacientes) {
 			for(Consulta consulta: paciente.getHistorialConsultas()) {
-				
+
 				Enfermedad diagnostico = consulta.getDiagnostico();
 				if(diagnostico != null) {
 					int cont = contEnfermedades.getOrDefault(diagnostico, 0);
@@ -284,31 +283,60 @@ public class SistemaGestion {
 		return contEnfermedades;
 	}
 	public ArrayList<String> getTop5Enfermedades(){
-		
+
 		HashMap<Enfermedad, Integer> reporte = getReporteEnfermedades();
 		ArrayList<Map.Entry<Enfermedad, Integer>> listaEntradas = new ArrayList<>(reporte.entrySet());
 		listaEntradas.sort(new Comparator<Map.Entry<Enfermedad, Integer>>() {
-			
-	        @Override
-	        public int compare(Map.Entry<Enfermedad, Integer> entry1, Map.Entry<Enfermedad, Integer> entry2) {
-	            return entry2.getValue().compareTo(entry1.getValue());
-	        }
-	    });
 
-	    ArrayList<String> reporteFinal = new ArrayList<>();
+			@Override
+			public int compare(Map.Entry<Enfermedad, Integer> entry1, Map.Entry<Enfermedad, Integer> entry2) {
+				return entry2.getValue().compareTo(entry1.getValue());
+			}
+		});
 
-	    int maxResultados = Math.min(5, listaEntradas.size());
-	    
-	    for (int i = 0; i < maxResultados; i++) {
-	        Map.Entry<Enfermedad, Integer> entrada = listaEntradas.get(i);
+		ArrayList<String> reporteFinal = new ArrayList<>();
 
-	        String nombreEnfermedad = entrada.getKey().getNombre(); 
-	        int cantidadCasos = entrada.getValue();
+		int maxResultados = Math.min(5, listaEntradas.size());
 
-	        String reporteItem = nombreEnfermedad + " - " + cantidadCasos + " casos";  
-	        reporteFinal.add(reporteItem);
-	    }
-	    return reporteFinal;
+		for (int i = 0; i < maxResultados; i++) {
+			Map.Entry<Enfermedad, Integer> entrada = listaEntradas.get(i);
+
+			String nombreEnfermedad = entrada.getKey().getNombre(); 
+			int cantidadCasos = entrada.getValue();
+
+			String reporteItem = nombreEnfermedad + " - " + cantidadCasos + " casos";  
+			reporteFinal.add(reporteItem);
+		}
+		return reporteFinal;
+	}
+
+	public HashMap<String, Integer> getReporteVacunacion() {
+		HashMap<String, Integer> reporte = new HashMap<>();
+
+		for (Vacuna vacCatalogo : this.catalogoVacunas) {
+
+			int cantAplicadas = 0;
+			int cantPendientes = 0;
+			String nombreVacuna = vacCatalogo.getNombre();
+
+			for (Paciente paciente : this.listaPacientes) {
+				HashMap<Vacuna, Boolean> registroPaciente = paciente.getRegistroVacunacion();
+				Boolean estaAplicada = registroPaciente.get(vacCatalogo);
+
+				if (estaAplicada == true) {
+					cantAplicadas++;
+
+				} else if (estaAplicada == false) {
+					cantPendientes++;
+
+				} else if(estaAplicada == null) {
+					cantPendientes++;
+				}
+			}
+			reporte.put(nombreVacuna + " - Aplicadas", cantAplicadas);
+			reporte.put(nombreVacuna + " - Pendientes", cantPendientes);
+		}
+		return reporte;
 	}
 }
 
