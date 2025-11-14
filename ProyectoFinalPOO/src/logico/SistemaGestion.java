@@ -146,6 +146,21 @@ public class SistemaGestion {
 		}
 		return aux;
 	}
+	
+	public Secretaria buscarSecretariaPorId(String idSecretaria) {
+	    Secretaria aux = null;
+	    boolean encontrado = false;
+	    int i = 0;
+	    while(!encontrado && i < listaSecretarias.size()) { 
+	        if(listaSecretarias.get(i).getId().equalsIgnoreCase(idSecretaria)) {
+	            aux = listaSecretarias.get(i);
+	            encontrado = true;
+	        }
+	        i++;
+	    }
+	    return aux;
+	}
+	
 	public Cita crearCita(String idVisitante, String nombreVisitante,String idMedico, LocalDateTime horarioMed) {
 		Cita aux = null;
 		Medico med = buscarMedicoPorId(idMedico);
@@ -166,6 +181,22 @@ public class SistemaGestion {
 			citaAux.setEstado("cancelada");
 			citaAux.getMedico().liberarAgenda(citaAux);		
 		}
+	}
+	
+	public Medico getMedicoLogueado(Usuario user) {
+	    if (user != null && user.getRol().equalsIgnoreCase("MEDICO")) {
+	        return buscarMedicoPorId(user.getIdPersonaVinculada());
+	    } else {
+	        return null;
+	    }
+	}
+	
+	public Secretaria getSecretariaLogueada(Usuario user) {
+	    if (user != null && user.getRol().equalsIgnoreCase("SECRETARIA")) {
+	        return buscarSecretariaPorId(user.getIdPersonaVinculada());
+	    } else {
+	        return null;
+	    }
 	}
 }
 

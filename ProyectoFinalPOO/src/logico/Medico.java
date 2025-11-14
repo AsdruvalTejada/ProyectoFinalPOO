@@ -1,6 +1,5 @@
 package logico;
 
-//
 import java.util.ArrayList;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -23,9 +22,9 @@ public class Medico extends Persona {
 		this.especialidad = especialidad;
 		this.limiteCitasPorDia = limiteCitasPorDia;
 		this.duracionCitaMinutos = duracionCitaMinutos;
-		agenda = new ArrayList<>();
-		horarioFijo = new ArrayList<>();
-		exceptHorario = new ArrayList<>();
+		this.agenda = new ArrayList<>();
+		this.horarioFijo = new ArrayList<>();
+		this.exceptHorario = new ArrayList<>();
 	}
 	
 	public String getEspecialidad() {
