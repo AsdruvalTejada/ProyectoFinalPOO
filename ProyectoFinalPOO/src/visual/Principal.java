@@ -29,12 +29,12 @@ public class Principal extends JFrame {
 		String rol = userLogueado.getRol();
 		setTitle("Clínica - " + "Usuario: " + userLogueado.getUsername() + " (" + rol + ")");
 		
-		if(rol.equalsIgnoreCase("MEDICO")) {
-			//visual para el médico
+		if(rol.equalsIgnoreCase("ADMIN")) {
+			//visual para el admin
 		}else if(rol.equalsIgnoreCase("SECRETARIA")) {
 			//visual para la secretaria
-		}else if(rol.equalsIgnoreCase("ADMIN")){
-			//visual para admin
+		}else if(rol.equalsIgnoreCase("MEDICO")){
+			//visual para médico
 		}
 	}
 	
