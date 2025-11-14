@@ -77,10 +77,10 @@ public class Login extends JFrame {
                 String username = txtUsuario.getText();
                 String password = new String(txtPassword.getPassword()); 
                 
-                Usuario usuarioValidado = SistemaGestion.getInstance().validarLogin(username, password);
+                Usuario userValid = SistemaGestion.getInstance().validarLogin(username, password);
                 
-                if (usuarioValidado != null) {                    
-                    principal = new Principal();
+                if (userValid != null) {                    
+                    principal = new Principal(userValid);
                     principal.setVisible(true);
                     
                     dispose(); 
