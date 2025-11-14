@@ -1,7 +1,11 @@
 package logico;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
+import java.util.Comparator; 
+import java.util.Collections;
 
 public class SistemaGestion {
 	private ArrayList<Paciente> listaPacientes;
@@ -263,6 +267,48 @@ public class SistemaGestion {
 		}
 		
 		return finalizado;
+	}
+	public HashMap<Enfermedad, Integer>getReporteEnfermedades(){
+		HashMap<Enfermedad, Integer> contEnfermedades = new HashMap<>();
+		
+		for(Paciente paciente: listaPacientes) {
+			for(Consulta consulta: paciente.getHistorialConsultas()) {
+				
+				Enfermedad diagnostico = consulta.getDiagnostico();
+				if(diagnostico != null) {
+					int cont = contEnfermedades.getOrDefault(diagnostico, 0);
+					contEnfermedades.put(diagnostico, cont+1);
+				}
+			}
+		}
+		return contEnfermedades;
+	}
+	public ArrayList<String> getTop5Enfermedades(){
+		
+		HashMap<Enfermedad, Integer> reporte = getReporteEnfermedades();
+		ArrayList<Map.Entry<Enfermedad, Integer>> listaEntradas = new ArrayList<>(reporte.entrySet());
+		listaEntradas.sort(new Comparator<Map.Entry<Enfermedad, Integer>>() {
+			
+	        @Override
+	        public int compare(Map.Entry<Enfermedad, Integer> entry1, Map.Entry<Enfermedad, Integer> entry2) {
+	            return entry2.getValue().compareTo(entry1.getValue());
+	        }
+	    });
+
+	    ArrayList<String> reporteFinal = new ArrayList<>();
+
+	    int maxResultados = Math.min(5, listaEntradas.size());
+	    
+	    for (int i = 0; i < maxResultados; i++) {
+	        Map.Entry<Enfermedad, Integer> entrada = listaEntradas.get(i);
+
+	        String nombreEnfermedad = entrada.getKey().getNombre(); 
+	        int cantidadCasos = entrada.getValue();
+
+	        String reporteItem = nombreEnfermedad + " - " + cantidadCasos + " casos";  
+	        reporteFinal.add(reporteItem);
+	    }
+	    return reporteFinal;
 	}
 }
 
