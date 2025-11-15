@@ -151,6 +151,7 @@ public class SistemaGestion {
 		}
 		return aux;
 	}
+
 	public Consulta buscarConsultaPorId(String idConsulta) {
 		for(Paciente paciente: listaPacientes) {
 			ArrayList <Consulta> hisConsul = paciente.getHistorialConsultas();
@@ -164,6 +165,7 @@ public class SistemaGestion {
 		}
 		return null;
 	}
+
 	public Secretaria buscarSecretariaPorId(String idSecretaria) {
 		Secretaria aux = null;
 		boolean encontrado = false;
@@ -192,6 +194,7 @@ public class SistemaGestion {
 
 		return aux;
 	}
+
 	public void cancelarCita(String idCita) {
 		Cita citaAux = buscarCitaPorId(idCita);
 		if(citaAux != null && citaAux.citaPuedeCancelarse()) {
@@ -215,6 +218,7 @@ public class SistemaGestion {
 			return null;
 		}
 	}
+
 	public Consulta iniciarConsulta(String idCita, String apellido, LocalDate fechaNacimiento, String sexo, String contacto, String sintomas) {
 		Consulta ConAux = null;
 		Cita citaAux = buscarCitaPorId(idCita);
@@ -237,6 +241,7 @@ public class SistemaGestion {
 		}
 		return ConAux;
 	}
+
 	public boolean modificarCita(String idCita, LocalDateTime nuevaFecha, Medico nuevoMedico) {
 		Cita cita = buscarCitaPorId(idCita);
 		boolean realizado = false;
@@ -254,6 +259,7 @@ public class SistemaGestion {
 		}
 		return realizado;
 	}
+
 	public boolean finalizarConsulta(String idConsulta, Enfermedad diagnostico, String tratamiento, boolean esImportante, ArrayList <Vacuna>vacunasAplicadas) {
 		boolean finalizado = false;
 		Consulta consulta = buscarConsultaPorId(idConsulta);
@@ -267,6 +273,7 @@ public class SistemaGestion {
 
 		return finalizado;
 	}
+
 	public HashMap<Enfermedad, Integer>getReporteEnfermedades(){
 		HashMap<Enfermedad, Integer> contEnfermedades = new HashMap<>();
 
@@ -282,6 +289,7 @@ public class SistemaGestion {
 		}
 		return contEnfermedades;
 	}
+
 	public ArrayList<String> getTop5Enfermedades(){
 
 		HashMap<Enfermedad, Integer> reporte = getReporteEnfermedades();
@@ -337,6 +345,26 @@ public class SistemaGestion {
 			reporte.put(nombreVacuna + " - Pendientes", cantPendientes);
 		}
 		return reporte;
+	}
+
+	public boolean assignMedASecretaria(String idMed, String idSec) {
+		Secretaria sec = buscarSecretariaPorId(idSec);
+		Medico med = buscarMedicoPorId(idMed);
+
+		if(med != null && sec != null) {
+			return sec.asignarMedico(med);
+		}
+		return false;
+	}
+	
+	public boolean unassignMedASecretaria(String idMed, String idSec) {
+		Secretaria sec = buscarSecretariaPorId(idSec);
+		Medico med = buscarMedicoPorId(idMed);
+
+		if(med != null && sec != null) {
+			return sec.desasignarMedico(med);
+		}
+		return false;
 	}
 }
 
