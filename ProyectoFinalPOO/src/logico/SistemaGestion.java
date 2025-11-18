@@ -5,7 +5,6 @@ import java.util.Map;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.Comparator; 
-import java.util.Collections;
 
 public class SistemaGestion {
 	private ArrayList<Paciente> listaPacientes;
