@@ -24,10 +24,10 @@ import logico.Cita;
 import logico.Medico;
 import logico.SistemaGestion;
 
+@SuppressWarnings("serial")
 public class CalendarioSecretaria extends JPanel {
 
-    private static final long serialVersionUID = 1L;
-    private JPanel panelDias;
+	private JPanel panelDias;
     private JLabel lblMesAnio;
     private YearMonth mesActual;
     
