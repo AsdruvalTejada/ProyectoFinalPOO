@@ -92,6 +92,7 @@ public class PanelAdmin_Personal extends JPanel {
 		estilizarBoton(btnNuevaSecretaria);
 		btnNuevaSecretaria.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				//Implementación pendiente
 				JOptionPane.showMessageDialog(null, "Aquí se abrirá el FormRegSecretaria (Pendiente de crear)");
 			}
 		});

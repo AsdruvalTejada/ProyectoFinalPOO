@@ -91,7 +91,6 @@ public class PrincipalAdmin extends JFrame {
         btnReportes.addActionListener(e -> cardLayout.show(pnlMainContent, "reportes"));
         btnCatalogos.addActionListener(e -> cardLayout.show(pnlMainContent, "catalogos"));
         
-        // Mostrar el panel de Citas por defecto
         cardLayout.show(pnlMainContent, "citas");
     }
     
@@ -121,7 +120,6 @@ public class PrincipalAdmin extends JFrame {
         return button;
     }
     
-    //Panel de contenido
     @SuppressWarnings("unused")
 	private JPanel createPlaceholderPanel(String title) {
         JPanel panel = new JPanel(new BorderLayout());

@@ -139,7 +139,7 @@ public class FormRegMedico extends JDialog {
 
         crearLabel("Duración Cita:", 30, 270, panelForm);
         spnDuracion = new JSpinner();
-        spnDuracion.setModel(new SpinnerNumberModel(30, 10, 120, 5)); // Default 30, min 10, max 120, step 5
+        spnDuracion.setModel(new SpinnerNumberModel(30, 10, 120, 5));
         spnDuracion.setBounds(140, 270, 60, 25);
         panelForm.add(spnDuracion);
         
@@ -150,7 +150,7 @@ public class FormRegMedico extends JDialog {
 
         crearLabel("Límite Diario:", 310, 270, panelForm);
         spnLimite = new JSpinner();
-        spnLimite.setModel(new SpinnerNumberModel(10, 1, 50, 1)); // Default 10 citas
+        spnLimite.setModel(new SpinnerNumberModel(10, 1, 50, 1));
         spnLimite.setBounds(390, 270, 60, 25);
         panelForm.add(spnLimite);
         
@@ -179,7 +179,7 @@ public class FormRegMedico extends JDialog {
 
         JButton btnCancelar = new JButton("CANCELAR");
         btnCancelar.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnCancelar.setBackground(new Color(220, 53, 69)); // Rojo suave
+        btnCancelar.setBackground(new Color(220, 53, 69)); 
         btnCancelar.setForeground(Color.WHITE);
         btnCancelar.setFocusPainted(false);
         btnCancelar.addActionListener(e -> dispose());
