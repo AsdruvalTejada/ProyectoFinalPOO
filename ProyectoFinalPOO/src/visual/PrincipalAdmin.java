@@ -24,11 +24,11 @@ public class PrincipalAdmin extends JFrame {
     private JPanel pnlMainContent;
     private CardLayout cardLayout;
     
-    private Color COLOR_SIDEBAR = new Color(33, 37, 41);
+    private Color COLOR_SIDEBAR = new Color(10, 186, 181);
     private Color COLOR_BACKGROUND = new Color(248, 249, 250);
     private Color COLOR_CONTENT_BG = Color.WHITE;
     private Color COLOR_TEXT_LIGHT = Color.WHITE;
-    private Color COLOR_ACCENT = new Color(13, 110, 253);
+    private Color COLOR_ACCENT = new Color(86, 223, 207);
 
     /**
      * Create the frame.
@@ -72,19 +72,18 @@ public class PrincipalAdmin extends JFrame {
         
         //JPanel panelCitas = new PanelAdmin_Citas(COLOR_ACCENT); 
         //JPanel panelPacientes = new PanelAdmin_Pacientes(COLOR_ACCENT);
-        //JPanel panelPersonal = new PanelAdmin_Personal(COLOR_ACCENT);
+        JPanel panelPersonal = new PanelAdmin_Personal(COLOR_ACCENT);
         //JPanel panelUsuarios = new PanelAdmin_Usuarios(COLOR_ACCENT);
-        //JPanel panelReportes = new PanelAdmin_Reportes(COLOR_ACCENT);
+        JPanel panelReportes = new PanelAdmin_Reportes(COLOR_ACCENT);
         //JPanel panelCatalogos = new PanelAdmin_Catalogos(COLOR_ACCENT); // Reemplaza el placeholder
         
         //pnlMainContent.add(panelCitas, "citas");
         //pnlMainContent.add(panelPacientes, "pacientes");
-        //pnlMainContent.add(panelPersonal, "personal");
+        pnlMainContent.add(panelPersonal, "personal");
         //pnlMainContent.add(panelUsuarios, "usuarios");
-        //pnlMainContent.add(panelReportes, "reportes");
+        pnlMainContent.add(panelReportes, "reportes");
         //pnlMainContent.add(panelCatalogos, "catalogos");
 
-        // --- 6. DEFINIR ACCIONES DE LOS BOTONES ---
         btnCitas.addActionListener(e -> cardLayout.show(pnlMainContent, "citas"));
         btnPacientes.addActionListener(e -> cardLayout.show(pnlMainContent, "pacientes"));
         btnPersonal.addActionListener(e -> cardLayout.show(pnlMainContent, "personal"));
