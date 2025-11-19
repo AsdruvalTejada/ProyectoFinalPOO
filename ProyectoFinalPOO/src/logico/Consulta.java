@@ -13,8 +13,10 @@ public class Consulta {
     private Enfermedad diagnostico;
     private String tratamiento;
     private boolean esImportanteParaResumen; 
+    private float peso;
+    private String presionArterial;
 
-    public Consulta(String id, Cita citaAsociada, Paciente paciente, Medico medico, LocalDateTime fechaConsulta, String sintomas) {
+    public Consulta(String id, Cita citaAsociada, Paciente paciente, Medico medico, LocalDateTime fechaConsulta, String sintomas, float peso, String presionArterial) {
         super();
         this.id = id;
         this.citaAsociada = citaAsociada;
@@ -25,6 +27,8 @@ public class Consulta {
         this.diagnostico = null;
         this.tratamiento = "";
         this.esImportanteParaResumen = false;
+        this.peso = peso;
+        this.presionArterial = presionArterial;
     }
 
     public String getId() {
@@ -95,7 +99,27 @@ public class Consulta {
         this.esImportanteParaResumen = esImportanteParaResumen;
     }
     
-    public void finalizarConsulta(Enfermedad diagnostico, String tratamiento, boolean esImportanteParaResumen) {
+    public float getPeso() {
+		return peso;
+	}
+
+	public void setPeso(float peso) {
+		this.peso = peso;
+	}
+
+	public String getPresionArterial() {
+		return presionArterial;
+	}
+
+	public void setPresionArterial(String presionArterial) {
+		this.presionArterial = presionArterial;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public void finalizarConsulta(Enfermedad diagnostico, String tratamiento, boolean esImportanteParaResumen) {
         this.diagnostico = diagnostico;
         this.tratamiento = tratamiento;
         this.esImportanteParaResumen = esImportanteParaResumen;
