@@ -8,12 +8,16 @@ public class Paciente extends Persona {
 	
 	private ArrayList<Consulta> historialConsultas;
 	private HashMap<Vacuna, Boolean> registroVacunacion;
+	private String tipoSangre;
+	private float estatura;
 	
-	public Paciente(String id, String name, String apellido, LocalDate fechaNacimiento, String sexo, String contacto) {
+	public Paciente(String id, String name, String apellido, LocalDate fechaNacimiento, String sexo, String contacto, String tipoSangre, float estatura) {
 		super(id, name, apellido, fechaNacimiento, sexo, contacto);
 		
 		this.historialConsultas = new ArrayList<>();
 		this.registroVacunacion = new HashMap<>();
+		this.tipoSangre = tipoSangre;
+		this.estatura = estatura;
 	}
 
 	public ArrayList<Consulta> getHistorialConsultas() {
@@ -30,6 +34,21 @@ public class Paciente extends Persona {
 
 	public void setRegistroVacunacion(HashMap<Vacuna, Boolean> registroVacunacion) {
 		this.registroVacunacion = registroVacunacion;
+	}
+	public String getTipoSangre() {
+		return tipoSangre;
+	}
+
+	public void setTipoSangre(String tipoSangre) {
+		this.tipoSangre = tipoSangre;
+	}
+
+	public float getEstatura() {
+		return estatura;
+	}
+
+	public void setEstatura(float estatura) {
+		this.estatura = estatura;
 	}
 
 	public void inicializarRegistroVacunas(ArrayList<Vacuna> catalogoGeneral) {
