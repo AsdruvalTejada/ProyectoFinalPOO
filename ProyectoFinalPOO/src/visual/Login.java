@@ -76,13 +76,11 @@ public class Login extends JFrame {
                 
                 String username = txtUsuario.getText();
                 String password = new String(txtPassword.getPassword()); 
-                
                 Usuario userValid = SistemaGestion.getInstance().validarLogin(username, password);
                 
                 if (userValid != null) {                    
-                    principal = new Principal(userValid);
+                    principal = new Principal(userValid); 
                     principal.setVisible(true);
-                    
                     dispose(); 
                     
                 } else {
@@ -90,7 +88,8 @@ public class Login extends JFrame {
                     txtPassword.setText("");
                 }
             }
-        });//        
+        });
+        
         btnEntrar.setBounds(160, 130, 100, 30);
         contentPane.add(btnEntrar);
     }
