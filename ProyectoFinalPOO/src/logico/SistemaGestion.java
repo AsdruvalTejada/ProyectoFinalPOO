@@ -31,6 +31,10 @@ public class SistemaGestion {
 			Usuario adminDefault = new Usuario("admin", "admin", "ADMIN", "admin-001");
 			listaUsuarios.add(adminDefault);
 		}
+		
+		Secretaria secrePrueba = new Secretaria("SEC-001", "Wilmary", "Hernández", LocalDate.of(1995, 3, 15), "F", "829-307-1234");
+		registrarSecretaria(secrePrueba);
+		crearUsuarioSecretaria(secrePrueba, "secre", "123");
 	}
 
 	public static SistemaGestion getInstance(){
@@ -211,14 +215,6 @@ public class SistemaGestion {
 		}
 	}
 
-	public Secretaria getSecretariaLogueada(Usuario user) {
-		if (user != null && user.getRol().equalsIgnoreCase("SECRETARIA")) {
-			return buscarSecretariaPorId(user.getIdPersonaVinculada());
-		} else {
-			return null;
-		}
-	}
-
 	public Consulta iniciarConsulta(String idCita, String apellido, LocalDate fechaNacimiento, String sexo, String contacto, String sintomas) {
 		Consulta ConAux = null;
 		Cita citaAux = buscarCitaPorId(idCita);
@@ -366,5 +362,23 @@ public class SistemaGestion {
 		}
 		return false;
 	}
+	
+	public void registrarSecretaria(Secretaria sec) {
+		this.listaSecretarias.add(sec);
+	}
+
+	public void crearUsuarioSecretaria(Secretaria secretaria, String username, String password) {
+		Usuario nuevoUsuario = new Usuario(username, password, "SECRETARIA", secretaria.getId());
+		this.listaUsuarios.add(nuevoUsuario);
+	}
+
+
+	public Secretaria getSecretariaLogueada(Usuario user) {
+		if (user != null && user.getRol().equalsIgnoreCase("SECRETARIA")) {
+			return buscarSecretariaPorId(user.getIdPersonaVinculada());
+		}
+		return null;
+	}
+	
 }
 
