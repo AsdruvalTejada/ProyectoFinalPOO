@@ -24,9 +24,9 @@ import logico.Usuario;
 
 @SuppressWarnings("serial")
 public class PanelAdmin_Personal extends JPanel {
-
     private JTable tablePersonal;
     private DefaultTableModel model;
+    
 	public PanelAdmin_Personal(Color colorAccent) {
         setLayout(new BorderLayout(0, 0));
         setBackground(new Color(248, 249, 250));
