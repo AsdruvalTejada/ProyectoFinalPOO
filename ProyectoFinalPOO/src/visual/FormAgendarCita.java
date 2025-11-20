@@ -1,6 +1,7 @@
 package visual;
 
 import java.awt.BorderLayout;
+
 import java.awt.FlowLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -25,9 +26,9 @@ import logico.Cita;
 import logico.Medico;
 import logico.SistemaGestion;
 
+@SuppressWarnings("serial")
 public class FormAgendarCita extends JDialog {
 
-    private static final long serialVersionUID = 1L;
     private final JPanel contentPanel = new JPanel();
     private JTextField txtCodigo;
     private JTextField txtCedula;

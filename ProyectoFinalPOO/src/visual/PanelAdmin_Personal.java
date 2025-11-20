@@ -23,9 +23,9 @@ import logico.Medico;
 import logico.Secretaria;
 import logico.SistemaGestion;
 
+@SuppressWarnings("serial")
 public class PanelAdmin_Personal extends JPanel {
 
-	private static final long serialVersionUID = 1L;
 	private JTable tablePersonal;
 	private DefaultTableModel model;
 	private Color colorAccent;
