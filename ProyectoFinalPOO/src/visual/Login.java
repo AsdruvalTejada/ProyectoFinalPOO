@@ -87,8 +87,8 @@ public class Login extends JFrame {
 						adminFrame.setVisible(true);
 
 					} else if (rol.equalsIgnoreCase("MEDICO")) {
-						//PrincipalMedico medicoFrame = new PrincipalMedico(userValid);
-						//medicoFrame.setVisible(true);
+						PrincipalMedico medicoFrame = new PrincipalMedico(userValid);
+						medicoFrame.setVisible(true);
 
 					} else if (rol.equalsIgnoreCase("SECRETARIA")) {
 						PrincipalSecretaria secFrame = new PrincipalSecretaria(userValid);
