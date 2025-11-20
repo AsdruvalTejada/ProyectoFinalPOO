@@ -32,7 +32,6 @@ public class PanelAdmin_Reportes extends JPanel {
         setBackground(new Color(248, 249, 250)); 
         setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        // --- PANEL IZQUIERDO: TOP 5 ENFERMEDADES ---
         JPanel pnlTop5 = crearTarjetaBase("Top 5 Enfermedades");
         add(pnlTop5);
         
