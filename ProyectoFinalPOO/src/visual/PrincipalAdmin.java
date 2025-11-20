@@ -12,6 +12,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import logico.Usuario; 
@@ -29,11 +30,8 @@ public class PrincipalAdmin extends JFrame {
     private Color COLOR_CONTENT_BG = Color.WHITE;
     private Color COLOR_TEXT_LIGHT = Color.WHITE;
     private Color COLOR_ACCENT = new Color(86, 223, 207);
+    private Color COLOR_LOGOUT = new Color(220, 53, 69);
 
-    /**
-     * Create the frame.
-     */
-    
     public PrincipalAdmin(Usuario user) {
         
         setTitle("Panel de Administración - Clínica");
@@ -47,7 +45,7 @@ public class PrincipalAdmin extends JFrame {
 
         pnlSidebar = new JPanel();
         pnlSidebar.setBackground(COLOR_SIDEBAR);
-        pnlSidebar.setLayout(new GridLayout(12, 1, 0, 0));
+        pnlSidebar.setLayout(new GridLayout(12, 1, 0, 0)); 
         contentPane.add(pnlSidebar, BorderLayout.WEST);
 
         cardLayout = new CardLayout();
@@ -70,20 +68,38 @@ public class PrincipalAdmin extends JFrame {
         pnlSidebar.add(btnReportes);
         pnlSidebar.add(btnCatalogos);
         
-        //JPanel panelCitas = new PanelAdmin_Citas(COLOR_ACCENT); 
-        //JPanel panelPacientes = new PanelAdmin_Pacientes(COLOR_ACCENT);
-        JPanel panelPersonal = new PanelAdmin_Personal(COLOR_ACCENT);
-        //JPanel panelUsuarios = new PanelAdmin_Usuarios(COLOR_ACCENT);
-        JPanel panelReportes = new PanelAdmin_Reportes(COLOR_ACCENT);
-        //JPanel panelCatalogos = new PanelAdmin_Catalogos(COLOR_ACCENT); // Reemplaza el placeholder
+        pnlSidebar.add(new JLabel("")); 
+        pnlSidebar.add(new JLabel("")); 
+        pnlSidebar.add(new JLabel("")); 
+        pnlSidebar.add(new JLabel("")); 
         
-        //pnlMainContent.add(panelCitas, "citas");
-        //pnlMainContent.add(panelPacientes, "pacientes");
-        pnlMainContent.add(panelPersonal, "personal");
-        //pnlMainContent.add(panelUsuarios, "usuarios");
-        pnlMainContent.add(panelReportes, "reportes");
-        //pnlMainContent.add(panelCatalogos, "catalogos");
+        JButton btnLogout = new JButton("Cerrar Sesión");
+        btnLogout.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        btnLogout.setForeground(COLOR_LOGOUT);
+        btnLogout.setBackground(COLOR_SIDEBAR);
+        btnLogout.setFocusPainted(false);
+        btnLogout.setBorderPainted(false);
+        btnLogout.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnLogout.addActionListener(e -> cerrarSesion());
+        pnlSidebar.add(btnLogout);
 
+        // --- PANELES ---
+        // JPanel panelCitas = new PanelAdmin_Citas(COLOR_ACCENT); 
+        // JPanel panelPacientes = new PanelAdmin_Pacientes(COLOR_ACCENT);
+        JPanel panelPersonal = new PanelAdmin_Personal(COLOR_ACCENT);
+        // JPanel panelUsuarios = new PanelAdmin_Usuarios(COLOR_ACCENT);
+        JPanel panelReportes = new PanelAdmin_Reportes(COLOR_ACCENT);
+        // JPanel panelCatalogos = new PanelAdmin_Catalogos(COLOR_ACCENT); 
+        
+        // Placeholder panels
+        pnlMainContent.add(createPlaceholderPanel("Gestión de Citas"), "citas");
+        pnlMainContent.add(createPlaceholderPanel("Gestión de Pacientes"), "pacientes");
+        pnlMainContent.add(panelPersonal, "personal");
+        pnlMainContent.add(createPlaceholderPanel("Gestión de Usuarios"), "usuarios");
+        pnlMainContent.add(panelReportes, "reportes");
+        pnlMainContent.add(createPlaceholderPanel("Catálogos"), "catalogos");
+
+        // Eventos
         btnCitas.addActionListener(e -> cardLayout.show(pnlMainContent, "citas"));
         btnPacientes.addActionListener(e -> cardLayout.show(pnlMainContent, "pacientes"));
         btnPersonal.addActionListener(e -> cardLayout.show(pnlMainContent, "personal"));
@@ -91,13 +107,19 @@ public class PrincipalAdmin extends JFrame {
         btnReportes.addActionListener(e -> cardLayout.show(pnlMainContent, "reportes"));
         btnCatalogos.addActionListener(e -> cardLayout.show(pnlMainContent, "catalogos"));
         
-        cardLayout.show(pnlMainContent, "citas");
+        // Vista inicial
+        cardLayout.show(pnlMainContent, "personal"); // Mostramos personal por ahora para probar
     }
     
-    /**
-     * Método de utilidad para crear y estilizar los botones del sidebar
-     * Esto hace que se vean planos y modernos, como en tu inspiración.
-     */
+    private void cerrarSesion() {
+        int confirm = JOptionPane.showConfirmDialog(this, "¿Desea cerrar sesión y volver al login?", "Cerrar Sesión", JOptionPane.YES_NO_OPTION);
+        if(confirm == JOptionPane.YES_OPTION) {
+            dispose();
+            Login login = new Login();
+            login.setVisible(true);
+        }
+    }
+    
     private JButton createSidebarButton(String text) {
         JButton button = new JButton(text);
         button.setFont(new Font("Segoe UI", Font.BOLD, 16));
@@ -116,22 +138,16 @@ public class PrincipalAdmin extends JFrame {
                 button.setBackground(COLOR_SIDEBAR);
             }
         });
-        
         return button;
     }
     
-    @SuppressWarnings("unused")
-	private JPanel createPlaceholderPanel(String title) {
+    private JPanel createPlaceholderPanel(String title) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(COLOR_CONTENT_BG);
-        
         JLabel lblTitle = new JLabel(title);
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 24));
         lblTitle.setBorder(new EmptyBorder(10, 10, 10, 10));
         panel.add(lblTitle, BorderLayout.NORTH);
-        
-        panel.add(new JLabel("Contenido de " + title + " va aquí..."), BorderLayout.CENTER);
-        
         return panel;
     }
 }
