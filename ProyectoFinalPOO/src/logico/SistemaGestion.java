@@ -29,12 +29,19 @@ public class SistemaGestion {
 		listaSecretarias = new ArrayList<>();
 		if (listaUsuarios.isEmpty()) {
 			Usuario adminDefault = new Usuario("admin", "admin", "ADMIN", "admin-001");
+			Usuario adminDefault2 = new Usuario("angel", "123", "ADMIN", "admin-001");
 			listaUsuarios.add(adminDefault);
+			listaUsuarios.add(adminDefault2);
 		}
 		
 		Secretaria secrePrueba = new Secretaria("SEC-001", "Wilmary", "Hernández", LocalDate.of(1995, 3, 15), "F", "829-307-1234");
 		registrarSecretaria(secrePrueba);
 		crearUsuarioSecretaria(secrePrueba, "secre", "123");
+		
+		Medico medPrueba = new Medico("Med-001", "Angel", "Belliard", LocalDate.of(1995, 7, 23), "M", "809-555-5555", "Cardiologia", 10, 30, null, null, null);
+		registrarMedico(medPrueba);
+		crearUsuarioMedico(medPrueba, "doc", "123");
+		
 	}
 
 	public static SistemaGestion getInstance(){
@@ -214,26 +221,26 @@ public class SistemaGestion {
 			return null;
 		}
 	}
+	public void crearUsuarioMedico(Medico med, String username, String password) {
+		Usuario nuevoUsuario = new Usuario(username, password, "Medico", med.getId());
+		this.listaUsuarios.add(nuevoUsuario);
+	}
 
-	public Consulta iniciarConsulta(String idCita, String apellido, LocalDate fechaNacimiento, String sexo, String contacto, String sintomas) {
+	public Consulta iniciarConsulta(String idCita, String apellido, LocalDate fechaNacimiento, String sexo, String contacto, String sintomas, String tipoSangre, float estatura, float peso, String presionArterial) {
 		Consulta ConAux = null;
 		Cita citaAux = buscarCitaPorId(idCita);
 		if(citaAux != null){
+			
 			Paciente pac = buscarPacientePorId(citaAux.getIdPaciente());
 			if(pac == null){
-				pac = new Paciente(citaAux.getIdPaciente(), citaAux.getNameVisitante(), apellido, fechaNacimiento, sexo, contacto);
-				pac.inicializarRegistroVacunas(this.catalogoVacunas);
+				pac = new Paciente(citaAux.getIdPaciente(), citaAux.getNameVisitante(), apellido, fechaNacimiento, sexo, contacto, tipoSangre, estatura);				pac.inicializarRegistroVacunas(this.catalogoVacunas);
 				registrarPaciente(pac);
+				pac.inicializarRegistroVacunas(this.catalogoVacunas);
+			}
 
-				ConAux  = new Consulta("Co-"+genIdConsulta++, citaAux, pac, citaAux.getMedico(), LocalDateTime.now(), sintomas);
+				ConAux  = new Consulta("Co-"+genIdConsulta++, citaAux, pac, citaAux.getMedico(), LocalDateTime.now(), sintomas, peso, presionArterial);
 				citaAux.setEstado("completada");
 				pac.agregarConsulta(ConAux);
-			}
-			else {
-				ConAux  = new Consulta("Co-"+genIdConsulta++, citaAux, pac, citaAux.getMedico(), LocalDateTime.now(), sintomas);
-				citaAux.setEstado("completada");
-				pac.agregarConsulta(ConAux);
-			}
 		}
 		return ConAux;
 	}
