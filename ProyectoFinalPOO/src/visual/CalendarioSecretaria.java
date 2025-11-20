@@ -36,12 +36,12 @@ public class CalendarioSecretaria extends JPanel {
     private JPanel panelDias;
     private JLabel lblMesAnio;
     private YearMonth mesActual;
-
     private final Color COLOR_TEAL_PRINCIPAL = new Color(10, 186, 181);
     private final Color COLOR_FONDO_BLANCO   = Color.WHITE;
     private final Color COLOR_TEXTO_OSCURO   = new Color(50, 50, 50);
     private final Color COLOR_TEXTO_BLANCO   = Color.WHITE;
     private final Color COLOR_ROJO_CERRAR    = new Color(255, 80, 80);
+    
     private final Color COLOR_CELDA_HOY      = new Color(220, 245, 244); 
     private final Color COLOR_CELDA_CITA     = new Color(0, 200, 151);
     private final Color COLOR_CELDA_PASADO   = new Color(245, 245, 245); 
@@ -49,7 +49,6 @@ public class CalendarioSecretaria extends JPanel {
     public CalendarioSecretaria() {
         setLayout(new BorderLayout(0, 0));
         setBackground(COLOR_FONDO_BLANCO);
-
         JPanel panelLateral = new JPanel();
         panelLateral.setPreferredSize(new Dimension(240, 0)); 
         panelLateral.setBackground(COLOR_TEAL_PRINCIPAL);
@@ -92,15 +91,16 @@ public class CalendarioSecretaria extends JPanel {
             panelListaMedicos.add(lblMed);
             yPos += 30;
         }
+        
         JButton btnBuscarPaciente = new JButton("BUSCAR PACIENTE");
         btnBuscarPaciente.setBackground(COLOR_CELDA_CITA); 
         btnBuscarPaciente.setForeground(COLOR_TEXTO_BLANCO);
         btnBuscarPaciente.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnBuscarPaciente.setFocusPainted(false);
-        btnBuscarPaciente.setBorderPainted(false);
+        btnBuscarPaciente.setBorderPainted(false); 
         btnBuscarPaciente.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnBuscarPaciente.setBounds(20, 550, 200, 40);
-        
+
         btnBuscarPaciente.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent e) {
                 btnBuscarPaciente.setBackground(Color.WHITE);
@@ -111,6 +111,14 @@ public class CalendarioSecretaria extends JPanel {
                 btnBuscarPaciente.setForeground(COLOR_TEXTO_BLANCO);
             }
         });
+        btnBuscarPaciente.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                FormBuscarPaciente buscador = new FormBuscarPaciente();
+                buscador.setVisible(true);
+                refrescarCalendario();
+            }
+        });
+        
         panelLateral.add(btnBuscarPaciente);
         
         JButton btnCerrarSesion = new JButton("CERRAR SESIÓN");
@@ -128,7 +136,6 @@ public class CalendarioSecretaria extends JPanel {
             }
         });
         panelLateral.add(btnCerrarSesion);
-        
         JPanel panelCalendarioContenedor = new JPanel();
         panelCalendarioContenedor.setLayout(new BorderLayout(0, 20));
         panelCalendarioContenedor.setBackground(COLOR_FONDO_BLANCO);
@@ -279,10 +286,12 @@ public class CalendarioSecretaria extends JPanel {
                 lblInfo.setFont(new Font("Segoe UI", Font.PLAIN, 11));
                 celda.add(lblInfo, BorderLayout.CENTER);
             }
+
             if (fechaCelda.isBefore(hoy)) {
                 celda.setBackground(COLOR_CELDA_PASADO);
                 lblDia.setForeground(Color.GRAY);
             }
+
             if (!fechaCelda.isBefore(hoy)) {
                 celda.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 celda.addMouseListener(new MouseAdapter() {
@@ -297,8 +306,10 @@ public class CalendarioSecretaria extends JPanel {
                     }
                 });
             }
+
             panelDias.add(celda);
         }
+
         panelDias.revalidate();
         panelDias.repaint();
     }
@@ -316,6 +327,7 @@ public class CalendarioSecretaria extends JPanel {
     private void abrirOpcionesDia(LocalDate fecha, boolean tieneCitaPrevia) {
         FormOpcionesDia dialog = new FormOpcionesDia(fecha, tieneCitaPrevia, this);
         dialog.setVisible(true);
+        refrescarCalendario();
     }
     
     public void refrescarCalendario() {
