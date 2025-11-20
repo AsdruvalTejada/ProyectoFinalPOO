@@ -43,7 +43,7 @@ public class Login extends JFrame {
 	 * Create the frame.
 	 */
 	public Login() {
-		setTitle("Login - Sistema de Clínica");
+		setTitle("Login - Sistema de ClÃ­nica");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 220);
 		setLocationRelativeTo(null);
@@ -61,7 +61,7 @@ public class Login extends JFrame {
 		contentPane.add(txtUsuario);
 		txtUsuario.setColumns(10);
 
-		JLabel lblPassword = new JLabel("Contraseña:");
+		JLabel lblPassword = new JLabel("ContraseÃ±a:");
 		lblPassword.setBounds(50, 80, 80, 20);
 		contentPane.add(lblPassword);
 
@@ -103,7 +103,7 @@ public class Login extends JFrame {
 					dispose(); 
 
 				} else {
-					JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos", "Error de Login", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Usuario o contraseÃ±a incorrectos", "Error de Login", JOptionPane.ERROR_MESSAGE);
 					txtPassword.setText("");
 				}
 			}
