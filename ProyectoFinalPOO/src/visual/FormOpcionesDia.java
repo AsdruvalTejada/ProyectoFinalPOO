@@ -19,9 +19,8 @@ import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+@SuppressWarnings("serial")
 public class FormOpcionesDia extends JDialog {
-
-    private static final long serialVersionUID = 1L;
 
     private JPanel contentPane;
     private CalendarioSecretaria panelPadre; 
