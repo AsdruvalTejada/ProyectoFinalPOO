@@ -167,11 +167,9 @@ public class Medico extends Persona {
 	    
 	    ArrayList<LocalTime> slotsDisponibles = new ArrayList<>();
 	    
-	    // 1. Encontrar el turno para ese día (Ej. Lunes 08:00 a 12:00)
 	    TurnoJornada turnoDelDia = null;
 	    for (TurnoJornada t : this.horarioFijo) {
-            // Comparamos ignorando mayúsculas/minúsculas
-            // El día de la semana en Java es en inglés (MONDAY, TUESDAY...)
+
 	        if (t.getDiaSemana().equalsIgnoreCase(dia.getDayOfWeek().name())) {
 	            turnoDelDia = t;
 	            break;
@@ -179,30 +177,24 @@ public class Medico extends Persona {
 	    }
 
 	    if (turnoDelDia == null) {
-	        return slotsDisponibles; // No trabaja ese día, devuelve lista vacía
+	        return slotsDisponibles;
 	    }
 
-	    // 2. Iterar por el día, hora por hora (o cada 30 min según la duración)
 	    LocalTime horaActual = turnoDelDia.getHoraInicio();
 	    
-	    // Si duracionCitaMinutos es 0 o negativo, poner un default para evitar bucle infinito
 	    int duracion = (this.duracionCitaMinutos > 0) ? this.duracionCitaMinutos : 30; 
 
-        // Mientras la hora de fin de la cita no se pase del fin de turno
 	    while (!horaActual.plusMinutes(duracion).isAfter(turnoDelDia.getHoraFin())) {
 	        
-	        // 3. Probamos si está disponible
 	        LocalDateTime fechaHoraPrueba = LocalDateTime.of(dia, horaActual);
 	        
 	        if (this.estaDisponible(fechaHoraPrueba)) {
-	            // ¡Está disponible! Lo añadimos a la lista
 	            slotsDisponibles.add(horaActual);
 	        }
 	        
-	        // Avanzamos a la siguiente hora
 	        horaActual = horaActual.plusMinutes(duracion);
 	    }
 	    
-	    return slotsDisponibles; // Devuelve la lista de horas libres
+	    return slotsDisponibles;
 	}
 }

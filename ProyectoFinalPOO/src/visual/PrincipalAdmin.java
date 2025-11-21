@@ -31,7 +31,6 @@ public class PrincipalAdmin extends JFrame {
     private Color COLOR_CONTENT_BG = Color.WHITE;
     private Color COLOR_TEXT_LIGHT = Color.WHITE;
     private Color COLOR_ACCENT = new Color(86, 223, 207);
-    private Color COLOR_LOGOUT = new Color(220, 53, 69);
 
     public PrincipalAdmin(Usuario user) {
         
@@ -74,13 +73,7 @@ public class PrincipalAdmin extends JFrame {
         pnlSidebar.add(new JLabel("")); 
         pnlSidebar.add(new JLabel("")); 
         
-        JButton btnLogout = new JButton("Cerrar Sesión");
-        btnLogout.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        btnLogout.setForeground(COLOR_LOGOUT);
-        btnLogout.setBackground(COLOR_SIDEBAR);
-        btnLogout.setFocusPainted(false);
-        btnLogout.setBorderPainted(false);
-        btnLogout.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        JButton btnLogout = createSidebarButton("Cerrar Sesión");
         btnLogout.addActionListener(e -> cerrarSesion());
         pnlSidebar.add(btnLogout);
 
@@ -88,19 +81,17 @@ public class PrincipalAdmin extends JFrame {
         // JPanel panelCitas = new PanelAdmin_Citas(COLOR_ACCENT); 
         // JPanel panelPacientes = new PanelAdmin_Pacientes(COLOR_ACCENT);
         JPanel panelPersonal = new PanelAdmin_Personal(COLOR_ACCENT);
-        // JPanel panelUsuarios = new PanelAdmin_Usuarios(COLOR_ACCENT);
+        JPanel panelUsuarios = new PanelAdmin_Usuarios(COLOR_ACCENT);
         JPanel panelReportes = new PanelAdmin_Reportes(COLOR_ACCENT);
         // JPanel panelCatalogos = new PanelAdmin_Catalogos(COLOR_ACCENT); 
         
-        // Placeholder panels
         pnlMainContent.add(createPlaceholderPanel("Gestión de Citas"), "citas");
         pnlMainContent.add(createPlaceholderPanel("Gestión de Pacientes"), "pacientes");
         pnlMainContent.add(panelPersonal, "personal");
-        pnlMainContent.add(createPlaceholderPanel("Gestión de Usuarios"), "usuarios");
+        pnlMainContent.add(panelUsuarios, "usuarios");
         pnlMainContent.add(panelReportes, "reportes");
         pnlMainContent.add(createPlaceholderPanel("Catálogos"), "catalogos");
 
-        // Eventos
         btnCitas.addActionListener(e -> cardLayout.show(pnlMainContent, "citas"));
         btnPacientes.addActionListener(e -> cardLayout.show(pnlMainContent, "pacientes"));
         btnPersonal.addActionListener(e -> cardLayout.show(pnlMainContent, "personal"));
@@ -108,8 +99,7 @@ public class PrincipalAdmin extends JFrame {
         btnReportes.addActionListener(e -> cardLayout.show(pnlMainContent, "reportes"));
         btnCatalogos.addActionListener(e -> cardLayout.show(pnlMainContent, "catalogos"));
         
-        // Vista inicial
-        cardLayout.show(pnlMainContent, "personal"); // Mostramos personal por ahora para probar
+        cardLayout.show(pnlMainContent, "usuarios");
     }
     
     private void cerrarSesion() {
