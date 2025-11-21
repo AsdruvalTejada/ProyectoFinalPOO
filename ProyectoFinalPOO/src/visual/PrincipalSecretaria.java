@@ -1,13 +1,14 @@
 package visual;
 
 import java.awt.BorderLayout;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import logico.Usuario;
 
+@SuppressWarnings("serial")
 public class PrincipalSecretaria extends JFrame {
 
-    private static final long serialVersionUID = 1L;
     private JPanel contentPane;
     @SuppressWarnings("unused") // Guardaré el usuario por si se necesita para lógica futura
     private Usuario userLogueado;
