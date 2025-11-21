@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
@@ -14,6 +15,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -23,6 +25,7 @@ import javax.swing.SpinnerDateModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.text.MaskFormatter;
 
 import logico.Secretaria;
 import logico.SistemaGestion;
@@ -31,10 +34,10 @@ public class FormRegSecretaria extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
-	private JTextField txtCedula;
+	private JTextField txtId; // Antes txtCedula
 	private JTextField txtNombre;
 	private JTextField txtApellido;
-	private JTextField txtTelefono;
+	private JFormattedTextField txtTelefono; // Con Máscara
 	private JSpinner spnFechaNac;
 	private JComboBox<String> cbxSexo;
 	private Secretaria secreEdit = null;
@@ -78,11 +81,14 @@ public class FormRegSecretaria extends JDialog {
 		panelForm.setLayout(null);
 		contentPanel.add(panelForm);
 
-		crearLabel("Cédula / ID:", 30, 20, panelForm);
-		txtCedula = new JTextField();
-		txtCedula.setBounds(140, 20, 150, 25);
-		configurarCampo(txtCedula);
-		panelForm.add(txtCedula);
+		// --- ID GENERADO ---
+		crearLabel("ID Secre:", 30, 20, panelForm);
+		txtId = new JTextField();
+		txtId.setBounds(140, 20, 150, 25);
+		txtId.setEditable(false);
+		txtId.setBackground(new Color(220, 220, 220));
+		configurarCampo(txtId);
+		panelForm.add(txtId);
 
 		crearLabel("Nombre:", 30, 60, panelForm);
 		txtNombre = new JTextField();
@@ -109,10 +115,18 @@ public class FormRegSecretaria extends JDialog {
 		cbxSexo.setBounds(380, 100, 100, 25);
 		panelForm.add(cbxSexo);
 
+		// --- MÁSCARA TELEFONO ---
 		crearLabel("Teléfono:", 30, 140, panelForm);
-		txtTelefono = new JTextField();
+		try {
+			MaskFormatter mascaraTel = new MaskFormatter("###-###-####");
+			mascaraTel.setPlaceholderCharacter('_');
+			txtTelefono = new JFormattedTextField(mascaraTel);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			txtTelefono = new JFormattedTextField();
+		}
 		txtTelefono.setBounds(140, 140, 150, 25);
-		configurarCampo(txtTelefono);
+		txtTelefono.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		panelForm.add(txtTelefono);
 
 		JPanel panelBotones = new JPanel();
@@ -141,7 +155,23 @@ public class FormRegSecretaria extends JDialog {
 		btnCancelar.addActionListener(e -> dispose());
 		panelBotones.add(btnCancelar);
 
-		cargarDatosSiEsEdicion();
+		// Inicializar
+		if (this.secreEdit == null) {
+			generarNuevoId();
+		} else {
+			cargarDatosSiEsEdicion();
+		}
+	}
+	
+	private void generarNuevoId() {
+		int siguienteId = SistemaGestion.getInstance().getListaSecretarias().size() + 1;
+		String idGenerado = String.format("SEC-%03d", siguienteId);
+		
+		while(SistemaGestion.getInstance().buscarSecretariaPorId(idGenerado) != null) {
+			siguienteId++;
+			idGenerado = String.format("SEC-%03d", siguienteId);
+		}
+		txtId.setText(idGenerado);
 	}
 
 	private void crearLabel(String texto, int x, int y, JPanel panel) {
@@ -159,8 +189,8 @@ public class FormRegSecretaria extends JDialog {
 
 	private void cargarDatosSiEsEdicion() {
 		if(secreEdit != null) {
-			txtCedula.setText(secreEdit.getId());
-			txtCedula.setEditable(false);
+			txtId.setText(secreEdit.getId());
+			
 			txtNombre.setText(secreEdit.getName());
 			txtApellido.setText(secreEdit.getApellido());
 			txtTelefono.setText(secreEdit.getContacto());
@@ -173,13 +203,14 @@ public class FormRegSecretaria extends JDialog {
 	}
 
 	private void guardar() {
-		if (txtCedula.getText().isEmpty() || txtNombre.getText().isEmpty() || 
-				txtApellido.getText().isEmpty()) {
+		String telefono = txtTelefono.getText();
+		
+		if (txtNombre.getText().isEmpty() || txtApellido.getText().isEmpty() || telefono.contains("_")) {
 			JOptionPane.showMessageDialog(this, "Complete los campos obligatorios.", "Aviso", JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 
-		String id = txtCedula.getText();
+		String id = txtId.getText();
 		String nombre = txtNombre.getText();
 		String apellido = txtApellido.getText();
 		String contacto = txtTelefono.getText();
@@ -188,14 +219,12 @@ public class FormRegSecretaria extends JDialog {
 		LocalDate fechaNac = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
 		if(secreEdit == null) {
-			if(SistemaGestion.getInstance().buscarSecretariaPorId(id) != null) {
-				JOptionPane.showMessageDialog(this, "Ya existe una secretaria con este ID.", "Error", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
+			// --- Crear ---
 			Secretaria nueva = new Secretaria(id, nombre, apellido, fechaNac, sexo, contacto);
 			SistemaGestion.getInstance().registrarSecretaria(nueva);
-			JOptionPane.showMessageDialog(this, "Registrada correctamente.");
+			JOptionPane.showMessageDialog(this, "Registrada correctamente con ID: " + id);
 		} else {
+			// --- Editar ---
 			secreEdit.setName(nombre);
 			secreEdit.setApellido(apellido);
 			secreEdit.setSexo(sexo);
@@ -205,5 +234,4 @@ public class FormRegSecretaria extends JDialog {
 		}
 		dispose();
 	}
-	
 }

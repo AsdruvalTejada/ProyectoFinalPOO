@@ -1,12 +1,12 @@
 package visual;
 
 import java.awt.BorderLayout;
-
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -16,6 +16,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -26,6 +27,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.text.MaskFormatter;
 
 import logico.Medico;
 import logico.SistemaGestion;
@@ -34,26 +36,39 @@ public class FormRegMedico extends JDialog {
 
     private static final long serialVersionUID = 1L;
     private final JPanel contentPanel = new JPanel();
-    private JTextField txtCedula;
+    private JTextField txtId;
     private JTextField txtNombre;
     private JTextField txtApellido;
-    private JTextField txtTelefono;
-    private JTextField txtEspecialidad;
+    private JFormattedTextField txtTelefono;
+    private JComboBox<String> cbxEspecialidad; // CAMBIO: JComboBox
     private JSpinner spnFechaNac;
     private JComboBox<String> cbxSexo;
     private JSpinner spnDuracion;
     private JSpinner spnLimite;
     
-    // Variable para controlar si estamos editando
     private Medico medicoEdicion = null;
 
     private final Color COLOR_FONDO = new Color(253, 247, 238);
     private final Color COLOR_VERDE_BOTON = new Color(0, 168, 107);
     private final Color COLOR_TEXTO = new Color(60, 60, 60);
 
-    /**
-     * Constructor: Recibe un objeto Medico. Si es null, es registro nuevo.
-     */
+    // Lista predefinida de especialidades para evitar errores de escritura
+    private final String[] LISTA_ESPECIALIDADES = {
+        "Seleccione...", 
+        "Medicina General",
+        "Cardiología",
+        "Pediatría",
+        "Dermatología",
+        "Ginecología",
+        "Neurología",
+        "Ortopedia",
+        "Oftalmología",
+        "Psiquiatría",
+        "Urología",
+        "Gastroenterología",
+        "Neumología"
+    };
+
     public FormRegMedico(Medico medico) {
         this.medicoEdicion = medico;
         
@@ -69,7 +84,6 @@ public class FormRegMedico extends JDialog {
         getContentPane().add(contentPanel, BorderLayout.CENTER);
         contentPanel.setLayout(null);
 
-        // --- HEADER ---
         JPanel panelHeader = new JPanel();
         panelHeader.setBounds(20, 20, 595, 50);
         panelHeader.setBackground(COLOR_FONDO);
@@ -83,7 +97,6 @@ public class FormRegMedico extends JDialog {
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 24));
         panelHeader.add(lblTitulo, BorderLayout.CENTER);
 
-        // --- FORMULARIO ---
         JPanel panelForm = new JPanel();
         panelForm.setBounds(20, 85, 595, 360);
         panelForm.setBackground(COLOR_FONDO);
@@ -91,12 +104,14 @@ public class FormRegMedico extends JDialog {
         panelForm.setLayout(null);
         contentPanel.add(panelForm);
 
-        // 1. Datos Personales
-        crearLabel("Cédula / ID:", 30, 20, panelForm);
-        txtCedula = new JTextField();
-        txtCedula.setBounds(140, 20, 150, 25);
-        configurarCampo(txtCedula);
-        panelForm.add(txtCedula);
+        // --- ID GENERADO ---
+        crearLabel("ID Médico:", 30, 20, panelForm);
+        txtId = new JTextField();
+        txtId.setBounds(140, 20, 150, 25);
+        txtId.setEditable(false); 
+        txtId.setBackground(new Color(220, 220, 220));
+        configurarCampo(txtId);
+        panelForm.add(txtId);
 
         crearLabel("Nombre:", 30, 60, panelForm);
         txtNombre = new JTextField();
@@ -123,19 +138,25 @@ public class FormRegMedico extends JDialog {
         cbxSexo.setBounds(390, 100, 100, 25);
         panelForm.add(cbxSexo);
 
+        // --- TELÉFONO CON MÁSCARA ---
         crearLabel("Teléfono:", 30, 140, panelForm);
-        txtTelefono = new JTextField();
+        try {
+            MaskFormatter mascaraTel = new MaskFormatter("###-###-####");
+            mascaraTel.setPlaceholderCharacter('_');
+            txtTelefono = new JFormattedTextField(mascaraTel);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            txtTelefono = new JFormattedTextField(); 
+        }
         txtTelefono.setBounds(140, 140, 150, 25);
-        configurarCampo(txtTelefono);
+        txtTelefono.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         panelForm.add(txtTelefono);
 
-        // Separador
         JLabel lblSeparator = new JLabel("__________________________________________________________________________");
         lblSeparator.setForeground(Color.LIGHT_GRAY);
         lblSeparator.setBounds(30, 170, 550, 14);
         panelForm.add(lblSeparator);
 
-        // 2. Datos Profesionales
         JLabel lblTituloPro = new JLabel("Datos Profesionales");
         lblTituloPro.setFont(new Font("Segoe UI", Font.BOLD, 14));
         lblTituloPro.setForeground(COLOR_VERDE_BOTON);
@@ -143,10 +164,12 @@ public class FormRegMedico extends JDialog {
         panelForm.add(lblTituloPro);
 
         crearLabel("Especialidad:", 30, 230, panelForm);
-        txtEspecialidad = new JTextField();
-        txtEspecialidad.setBounds(140, 230, 200, 25);
-        configurarCampo(txtEspecialidad);
-        panelForm.add(txtEspecialidad);
+        // CAMBIO: Ahora es un JComboBox
+        cbxEspecialidad = new JComboBox<>(LISTA_ESPECIALIDADES);
+        cbxEspecialidad.setBackground(Color.WHITE);
+        cbxEspecialidad.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        cbxEspecialidad.setBounds(140, 230, 200, 25);
+        panelForm.add(cbxEspecialidad);
 
         crearLabel("Duración Cita:", 30, 270, panelForm);
         spnDuracion = new JSpinner();
@@ -170,7 +193,6 @@ public class FormRegMedico extends JDialog {
         lblCitas.setBounds(460, 270, 50, 25);
         panelForm.add(lblCitas);
         
-        // --- BOTONES ---
         JPanel panelBotones = new JPanel();
         panelBotones.setBounds(20, 455, 595, 50);
         panelBotones.setBackground(COLOR_FONDO);
@@ -197,8 +219,22 @@ public class FormRegMedico extends JDialog {
         btnCancelar.addActionListener(e -> dispose());
         panelBotones.add(btnCancelar);
         
-        // Cargar datos si es edición
-        cargarDatosSiEsEdicion();
+        // Lógica de inicialización
+        if (this.medicoEdicion == null) {
+            generarNuevoId();
+        } else {
+            cargarDatosSiEsEdicion();
+        }
+    }
+    
+    private void generarNuevoId() {
+        int siguienteId = SistemaGestion.getInstance().getListaMedicos().size() + 1;
+        String idGenerado = String.format("MED-%03d", siguienteId);
+        while(SistemaGestion.getInstance().buscarMedicoPorId(idGenerado) != null) {
+            siguienteId++;
+            idGenerado = String.format("MED-%03d", siguienteId);
+        }
+        txtId.setText(idGenerado);
     }
 
     private void crearLabel(String texto, int x, int y, JPanel panel) {
@@ -216,16 +252,16 @@ public class FormRegMedico extends JDialog {
     
     private void cargarDatosSiEsEdicion() {
         if(medicoEdicion != null) {
-            txtCedula.setText(medicoEdicion.getId());
-            txtCedula.setEditable(false); // ID no editable
-            txtCedula.setBackground(new Color(230, 230, 230));
-            
+            txtId.setText(medicoEdicion.getId());
             txtNombre.setText(medicoEdicion.getName());
             txtApellido.setText(medicoEdicion.getApellido());
-            txtTelefono.setText(medicoEdicion.getContacto());
-            txtEspecialidad.setText(medicoEdicion.getEspecialidad());
-            cbxSexo.setSelectedItem(medicoEdicion.getSexo());
+            txtTelefono.setValue(medicoEdicion.getContacto()); 
+            txtTelefono.setText(medicoEdicion.getContacto()); 
             
+            // CAMBIO: Cargar especialidad en el ComboBox
+            cbxEspecialidad.setSelectedItem(medicoEdicion.getEspecialidad());
+            
+            cbxSexo.setSelectedItem(medicoEdicion.getSexo());
             spnDuracion.setValue(medicoEdicion.getDuracionCitaMinutos());
             spnLimite.setValue(medicoEdicion.getLimiteCitasPorDia());
             
@@ -238,9 +274,11 @@ public class FormRegMedico extends JDialog {
     }
 
     private void gestionarGuardado() {
-        if (txtCedula.getText().isEmpty() || txtNombre.getText().isEmpty() || 
-            txtApellido.getText().isEmpty() || txtEspecialidad.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Por favor complete todos los campos de texto.", "Campos Vacíos", JOptionPane.WARNING_MESSAGE);
+        String telefono = txtTelefono.getText();
+        // Validar que seleccionaron especialidad
+        if (txtNombre.getText().isEmpty() || txtApellido.getText().isEmpty() || 
+            cbxEspecialidad.getSelectedIndex() == 0 || telefono.contains("_")) {
+            JOptionPane.showMessageDialog(this, "Por favor complete todos los campos.", "Campos Vacíos", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -250,33 +288,27 @@ public class FormRegMedico extends JDialog {
         }
 
         try {
-            String id = txtCedula.getText();
+            String id = txtId.getText();
             String nombre = txtNombre.getText();
             String apellido = txtApellido.getText();
             String contacto = txtTelefono.getText();
-            String especialidad = txtEspecialidad.getText();
-            String sexo = (String) cbxSexo.getSelectedItem();
             
+            // CAMBIO: Obtener especialidad del ComboBox
+            String especialidad = (String) cbxEspecialidad.getSelectedItem();
+            
+            String sexo = (String) cbxSexo.getSelectedItem();
             Date date = (Date) spnFechaNac.getValue();
             LocalDate fechaNac = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            
             int duracion = (int) spnDuracion.getValue();
             int limite = (int) spnLimite.getValue();
 
             if(medicoEdicion == null) {
-                // --- MODO CREAR ---
-                if(SistemaGestion.getInstance().buscarMedicoPorId(id) != null) {
-                    JOptionPane.showMessageDialog(this, "Ya existe un médico con esa Cédula/ID.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
                 Medico nuevoMedico = new Medico(id, nombre, apellido, fechaNac, sexo, contacto, 
                                                 especialidad, limite, duracion, 
                                                 new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
                 SistemaGestion.getInstance().registrarMedico(nuevoMedico);
-                JOptionPane.showMessageDialog(this, "Médico registrado exitosamente.");
-                
+                JOptionPane.showMessageDialog(this, "Médico registrado con ID: " + id);
             } else {
-                // --- MODO EDITAR ---
                 medicoEdicion.setName(nombre);
                 medicoEdicion.setApellido(apellido);
                 medicoEdicion.setFechaNacimiento(fechaNac);
@@ -285,12 +317,9 @@ public class FormRegMedico extends JDialog {
                 medicoEdicion.setEspecialidad(especialidad);
                 medicoEdicion.setDuracionCitaMinutos(duracion);
                 medicoEdicion.setLimiteCitasPorDia(limite);
-                
                 JOptionPane.showMessageDialog(this, "Médico modificado correctamente.");
             }
-
             dispose();
-
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error al guardar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
