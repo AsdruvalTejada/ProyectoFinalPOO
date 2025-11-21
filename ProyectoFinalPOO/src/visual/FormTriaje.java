@@ -70,6 +70,11 @@ public class FormTriaje extends JDialog {
         contentPanel.setLayout(null);
 
         Cita cita = SistemaGestion.getInstance().buscarCitaPorId(idCita);
+        if (cita == null) {
+            JOptionPane.showMessageDialog(this, "Error crítico: No se encontró la cita con ID: " + idCita, "Error", JOptionPane.ERROR_MESSAGE);
+            dispose(); 
+            return;    
+        }
         Paciente pacienteExistente = SistemaGestion.getInstance().buscarPacientePorId(cita.getIdPaciente());
         
         if (pacienteExistente == null) {

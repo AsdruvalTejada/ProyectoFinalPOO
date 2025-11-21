@@ -5,6 +5,7 @@ import java.util.Map;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.Comparator; 
+import java.time.LocalTime;
 
 public class SistemaGestion {
 	private ArrayList<Paciente> listaPacientes;
@@ -39,6 +40,11 @@ public class SistemaGestion {
 		crearUsuarioSecretaria(secrePrueba, "secre", "123");
 		
 		Medico medPrueba = new Medico("Med-001", "Angel", "Belliard", LocalDate.of(1995, 7, 23), "M", "809-555-5555", "Cardiologia", 10, 30, null, null, null);
+		medPrueba.addTurnoJornada("MONDAY", LocalTime.of(8, 0), LocalTime.of(17, 0));
+		medPrueba.addTurnoJornada("TUESDAY", LocalTime.of(8, 0), LocalTime.of(17, 0));
+		medPrueba.addTurnoJornada("WEDNESDAY", LocalTime.of(8, 0), LocalTime.of(17, 0));
+		medPrueba.addTurnoJornada("THURSDAY", LocalTime.of(8, 0), LocalTime.of(17, 0));
+		medPrueba.addTurnoJornada("FRIDAY", LocalTime.of(8, 0), LocalTime.of(17, 0));
 		registrarMedico(medPrueba);
 		crearUsuarioMedico(medPrueba, "doc", "123");
 		
@@ -107,8 +113,8 @@ public class SistemaGestion {
 		return null;
 	}
 	public void agregarCita(Cita cita) {
-		listaCitas.add(cita);
 		genIdCita++;
+		listaCitas.add(cita);
 	}
 	public void registrarPaciente(Paciente pac) {
 		listaPacientes.add(pac);
@@ -123,19 +129,19 @@ public class SistemaGestion {
 		catalogoVacunas.add(vac);
 	}
 	public Cita buscarCitaPorId(String idCita) {
-		Cita aux = null;
-		boolean encontrado = false;
-		int i = 0;
-		while(!encontrado && i < listaCitas.size()) {
-			if(listaCitas.get(i).getId().equalsIgnoreCase(idCita)) {
-				aux = listaCitas.get(i);
-				encontrado = true;
-			}
-			i++;
-
-		}		
-		return aux;
-	}
+        Cita aux = null;
+        boolean encontrado = false;
+        int i = 0;
+        
+        while(!encontrado && i < listaCitas.size()) {
+            if(listaCitas.get(i).getId().equalsIgnoreCase(idCita)) {
+                aux = listaCitas.get(i);
+                encontrado = true;
+            }
+            i++;
+        }        
+        return aux;
+    }
 	public Paciente buscarPacientePorId(String idPaciente) {
 		Paciente aux = null;
 		boolean encontrado = false;
@@ -197,8 +203,8 @@ public class SistemaGestion {
 		if(med != null) {
 
 			if(med.estaDisponible(horarioMed)) {
-				agregarCita(aux);
 				aux = new Cita("C-"+genIdCita, idVisitante, nombreVisitante, med, horarioMed, "pendiente");
+				agregarCita(aux);
 				med.agregarEnAgenda(aux);
 			}
 		}
