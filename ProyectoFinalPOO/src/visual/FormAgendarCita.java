@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -16,6 +17,7 @@ import java.util.Date;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -23,10 +25,12 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerDateModel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.MaskFormatter;
 
 import logico.Cita;
 import logico.Medico;
@@ -39,7 +43,7 @@ public class FormAgendarCita extends JDialog {
 
     private final JPanel contentPanel = new JPanel();
     private JTextField txtCodigo;
-    private JTextField txtCedula;
+    private JFormattedTextField txtCedula;
     private JTextField txtNombre;
     private JTextField txtApellido;
 
@@ -137,7 +141,22 @@ public class FormAgendarCita extends JDialog {
         lblCedula.setBounds(30, 60, 80, 25);
         panelForm.add(lblCedula);
 
-        txtCedula = new JTextField();
+        try {
+            MaskFormatter mascaraCedula = new MaskFormatter("###-#######-#");
+            mascaraCedula.setPlaceholderCharacter('_');
+            txtCedula = new JFormattedTextField(mascaraCedula);
+            
+            // Lógica para mover el foco automáticamente al terminar de escribir la cédula
+            // Se puede usar un CaretListener o FocusListener, aquí una implementación simple
+            // que solicita foco en 'txtNombre' si el campo se llena.
+            // Nota: Para JFormattedTextField con máscara, es más seguro dejar que el usuario presione TAB
+            // o usar un DocumentListener complejo.
+            // Sin embargo, para asegurar que el cursor INICIAL no esté en el código, hacemos esto:
+            
+        } catch (ParseException e) {
+            txtCedula = new JFormattedTextField(); 
+        }
+        
         txtCedula.setBounds(120, 60, 200, 25);
         txtCedula.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         panelForm.add(txtCedula);
@@ -167,6 +186,7 @@ public class FormAgendarCita extends JDialog {
         lblFecha.setForeground(COLOR_TEAL);
         lblFecha.setBounds(30, 150, 80, 25);
         panelForm.add(lblFecha);
+        
         if (modoSeleccionFecha) {
             spnFecha = new JSpinner(new SpinnerDateModel());
             spnFecha.setEditor(new JSpinner.DateEditor(spnFecha, "dd/MM/yyyy"));
@@ -248,6 +268,19 @@ public class FormAgendarCita extends JDialog {
         
         cargarMedicos();
 
+        // Lógica de foco inicial
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowOpened(java.awt.event.WindowEvent e) {
+                if (pacientePreseleccionado == null) {
+                    // Si no hay paciente, foco en Cédula
+                    txtCedula.requestFocus();
+                } else {
+                    // Si ya hay paciente, foco en Médico
+                    cbxMedico.requestFocus();
+                }
+            }
+        });
+
         if (this.pacientePreseleccionado != null) {
             txtCedula.setText(pacientePreseleccionado.getId());
             txtNombre.setText(pacientePreseleccionado.getName());
@@ -310,7 +343,9 @@ public class FormAgendarCita extends JDialog {
     }
     
     private void guardarCita() {
-        if (txtCedula.getText().isEmpty() || txtNombre.getText().isEmpty()) {
+        String cedulaLimpia = txtCedula.getText().replace("-", "").replace("_", "").trim();
+        
+        if (cedulaLimpia.isEmpty() || txtNombre.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Faltan datos del paciente.", "Error", JOptionPane.WARNING_MESSAGE);
             return;
         }

@@ -1,24 +1,25 @@
 package logico;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Paciente extends Persona {
-	
-	private ArrayList<Consulta> historialConsultas;
-	private HashMap<Vacuna, Boolean> registroVacunacion;
-	private String tipoSangre;
-	private float estatura;
-	
-	public Paciente(String id, String name, String apellido, LocalDate fechaNacimiento, String sexo, String contacto, String tipoSangre, float estatura) {
-		super(id, name, apellido, fechaNacimiento, sexo, contacto);
-		
-		this.historialConsultas = new ArrayList<>();
-		this.registroVacunacion = new HashMap<>();
-		this.tipoSangre = tipoSangre;
-		this.estatura = estatura;
-	}
+    
+    private String tipoSangre;
+    private float estatura;
+    private ArrayList<Consulta> historialConsultas;
+    private HashMap<Vacuna, Boolean> registroVacunacion;
+
+    public Paciente(String id, String name, String apellido, LocalDate fechaNacimiento, String sexo, String contacto, 
+                    String tipoSangre, float estatura) {
+        super(id, name, apellido, fechaNacimiento, sexo, contacto);
+        this.tipoSangre = tipoSangre;
+        this.estatura = estatura;
+        this.historialConsultas = new ArrayList<>();
+        this.registroVacunacion = new HashMap<>();
+    }
 
 	public ArrayList<Consulta> getHistorialConsultas() {
 		return historialConsultas;
@@ -51,27 +52,6 @@ public class Paciente extends Persona {
 		this.estatura = estatura;
 	}
 
-	public void inicializarRegistroVacunas(ArrayList<Vacuna> catalogoGeneral) {
-		this.registroVacunacion.clear();
-		for (Vacuna vacuna : catalogoGeneral) {
-			this.registroVacunacion.put(vacuna, false);
-		}
-	}
-
-	public void agregarConsulta(Consulta nuevaConsulta) {
-		if (nuevaConsulta != null) {
-			this.historialConsultas.add(nuevaConsulta);
-		}
-	}
-
-	public boolean marcarVacunaAplicada(Vacuna vacuna) {
-		if (this.registroContieneVacuna(vacuna)) {
-			this.registroVacunacion.put(vacuna, true);
-			return true;
-		}
-		return false; 
-	}
-
 	public ArrayList<Consulta> generarResumenHistorial() {
 		ArrayList<Consulta> resumen = new ArrayList<>();
 		
@@ -92,6 +72,12 @@ public class Paciente extends Persona {
 		return resumen;
 	}
 
+    public int getEdad() {
+        if (getFechaNacimiento() != null) {
+            return Period.between(getFechaNacimiento(), LocalDate.now()).getYears();
+        }
+        return 0;
+    }
 
 	public ArrayList<Vacuna> getVacunasPendientes() {
 		ArrayList<Vacuna> pendientes = new ArrayList<>();
@@ -105,23 +91,35 @@ public class Paciente extends Persona {
 		}
 		return pendientes;
 	}
-
-
-	public ArrayList<Vacuna> getVacunasAplicadas() {
-		ArrayList<Vacuna> aplicadas = new ArrayList<>();
-		for (Vacuna vacuna : this.registroVacunacion.keySet()) {
-			Boolean estaAplicada = this.registroVacunacion.get(vacuna);
-
-			if (estaAplicada == true) {
-				aplicadas.add(vacuna);
-			}
-		}
-		return aplicadas;
-	}
 	
+    public ArrayList<Vacuna> getVacunasAplicadas() {
+        ArrayList<Vacuna> aplicadas = new ArrayList<>();
+        for(Vacuna v : registroVacunacion.keySet()) {
+            if(registroVacunacion.get(v)) {
+                aplicadas.add(v);
+            }
+        }
+        return aplicadas;
+    }	
 
 	private boolean registroContieneVacuna(Vacuna vacuna) {
 		return this.registroVacunacion.containsKey(vacuna);
 	}
+	
+	 public void inicializarRegistroVacunas(ArrayList<Vacuna> catalogo) {
+	        for(Vacuna v : catalogo) {
+	            if(!registroVacunacion.containsKey(v)) {
+	                registroVacunacion.put(v, false);
+	            }
+	        }
+	    }
 
+	   public void agregarConsulta(Consulta c) {
+	        historialConsultas.add(c);
+	    }
+	    
+	    public void marcarVacunaAplicada(Vacuna v) {
+	        registroVacunacion.put(v, true);
+	    }
+	    
 }
