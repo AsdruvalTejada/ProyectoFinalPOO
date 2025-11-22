@@ -246,7 +246,6 @@ public class PrincipalMedico extends JFrame {
         	return;
         }
         String idCita = (String) modelAgenda.getValueAt(row, 2);
-        //(Recolección de datos basicos)
         FormTriaje triaje = new FormTriaje(idCita, this);
         triaje.setVisible(true);
     }

@@ -35,7 +35,6 @@ public class PanelAdmin_Pacientes extends JPanel {
         setBackground(new Color(248, 249, 250));
         setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        // --- HEADER ---
         JPanel pnlHeader = new JPanel(new BorderLayout());
         pnlHeader.setBackground(new Color(248, 249, 250));
         add(pnlHeader, BorderLayout.NORTH);
@@ -45,13 +44,11 @@ public class PanelAdmin_Pacientes extends JPanel {
         lblTitulo.setForeground(new Color(33, 37, 41));
         pnlHeader.add(lblTitulo, BorderLayout.WEST);
 
-        // --- TABLA ---
         JPanel pnlTabla = new JPanel(new BorderLayout());
         pnlTabla.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         pnlTabla.setBackground(new Color(248, 249, 250));
         add(pnlTabla, BorderLayout.CENTER);
 
-        // Agregada columna "Sangre"
         String[] headers = {"Cédula", "Nombre", "Apellido", "Sangre", "Teléfono", "Edad"};
         model = new DefaultTableModel() {
             @Override
@@ -71,7 +68,6 @@ public class PanelAdmin_Pacientes extends JPanel {
         JScrollPane scrollPane = new JScrollPane(tablePacientes);
         pnlTabla.add(scrollPane, BorderLayout.CENTER);
 
-        // --- BOTONES ---
         JPanel pnlBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         pnlBotones.setBackground(new Color(248, 249, 250));
         add(pnlBotones, BorderLayout.SOUTH);
