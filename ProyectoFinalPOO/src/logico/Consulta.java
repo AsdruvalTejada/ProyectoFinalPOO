@@ -1,9 +1,9 @@
 package logico;
-
 import java.time.LocalDateTime;
+import java.io.Serializable;
 
-public class Consulta {
-
+public class Consulta implements Serializable{
+	private static final long serialVersionUID = 1L;
     private String id;
     private Cita citaAsociada;
     private Paciente paciente;
@@ -12,11 +12,12 @@ public class Consulta {
     private String sintomas;
     private Enfermedad diagnostico;
     private String tratamiento;
-    private boolean esImportanteParaResumen; 
+    private boolean esImportanteParaResumen;
     private float peso;
     private String presionArterial;
 
-    public Consulta(String id, Cita citaAsociada, Paciente paciente, Medico medico, LocalDateTime fechaConsulta, String sintomas, float peso, String presionArterial) {
+    public Consulta(String id, Cita citaAsociada, Paciente paciente, Medico medico, LocalDateTime fechaConsulta, 
+                    String sintomas, float peso, String presionArterial) {
         super();
         this.id = id;
         this.citaAsociada = citaAsociada;
@@ -24,11 +25,11 @@ public class Consulta {
         this.medico = medico;
         this.fechaConsulta = fechaConsulta;
         this.sintomas = sintomas;
+        this.peso = peso;
+        this.presionArterial = presionArterial;
         this.diagnostico = null;
         this.tratamiento = "";
         this.esImportanteParaResumen = false;
-        this.peso = peso;
-        this.presionArterial = presionArterial;
     }
 
     public String getId() {
@@ -119,22 +120,14 @@ public class Consulta {
 		this.id = id;
 	}
 
-	public void finalizarConsulta(Enfermedad diagnostico, String tratamiento, boolean esImportanteParaResumen) {
-        this.diagnostico = diagnostico;
-        this.tratamiento = tratamiento;
-        this.esImportanteParaResumen = esImportanteParaResumen;
+    public void finalizarConsulta(Enfermedad diag, String trat, boolean esImp) {
+        this.diagnostico = diag;
+        this.tratamiento = trat;
+        this.esImportanteParaResumen = esImp;
     }
 
-    public boolean esVisiblePara(Medico medico) {
-        if (this.medico.equals(medico)) {
-            return true;
-        }
-
-        if (this.diagnostico != null && this.diagnostico.getEstaBajoVigilancia()) {
-            return true;
-        }
-
-        return false;
+	public boolean esVisiblePara(Medico medico) {
+        return true; 
     }
     
     @Override

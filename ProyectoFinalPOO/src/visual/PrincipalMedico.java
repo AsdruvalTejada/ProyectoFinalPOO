@@ -2,69 +2,81 @@ package visual;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SpinnerDateModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import javax.swing.border.MatteBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
 
 import logico.Cita;
 import logico.Medico;
+import logico.Paciente;
 import logico.SistemaGestion;
 import logico.Usuario;
-import logico.Paciente;
 
+@SuppressWarnings("serial")
 public class PrincipalMedico extends JFrame {
 
-    private static final long serialVersionUID = 1L;
     private JPanel contentPane;
     private Medico medicoActual;
-    
-    // Componentes de la Agenda
     private JTable tableAgenda;
     private DefaultTableModel modelAgenda;
+    
     private JLabel lblDetalleNombre;
     private JLabel lblDetalleHora;
     private JButton btnIniciarConsulta;
     private JButton btnVerHistorial;
+    private JPanel panelCardDetalle; 
     
-    // --- NUEVA PALETA DE COLORES (Estilo Secretaria/Admin) ---
-    private final Color COLOR_THEME = new Color(0, 190, 165); // Turquesa Vibrante
-    private final Color COLOR_BG_MAIN = Color.WHITE;          // Fondo Limpio
-    private final Color COLOR_TEXT_HEADER = new Color(0, 150, 136); // Turquesa Oscuro para textos
-    private final Color COLOR_TEXT_BODY = new Color(60, 60, 60);    // Gris Oscuro
-    private final Color COLOR_LOGOUT = new Color(255, 85, 85);      // Rojo suave
+    private JSpinner spnFechaAgenda;
+    private JButton btnAlertaCitasFuturas;
+    
+    private final Color COLOR_FONDO        = new Color(254, 251, 246); 
+    private final Color COLOR_TEAL_MAIN    = new Color(10, 186, 181);  
+    private final Color COLOR_VERDE_ACCION = new Color(0, 200, 151);   
+    private final Color COLOR_TEXTO_DARK   = new Color(50, 50, 50);    
+    private final Color COLOR_BLANCO       = Color.WHITE;
+    private final Color COLOR_ROJO_SALIR   = new Color(255, 80, 80);   
+    private final Color COLOR_AZUL_INFO    = new Color(0, 102, 204); 
+    private final Color COLOR_ALERTA       = new Color(255, 140, 0);  
 
     public PrincipalMedico(Usuario user) {
-        // Obtener el objeto Medico real
         this.medicoActual = SistemaGestion.getInstance().getMedicoLogueado(user);
 
-        setTitle("Panel Médico - Clínica");
+        setTitle("Panel Médico - Dr. " + (medicoActual != null ? medicoActual.getApellido() : "N/A"));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 1100, 700);
+        setBounds(100, 100, 1200, 750); 
         setLocationRelativeTo(null);
         
         contentPane = new JPanel();
-        contentPane.setBackground(COLOR_BG_MAIN);
-        contentPane.setBorder(new EmptyBorder(20, 20, 20, 20));
-        contentPane.setLayout(new BorderLayout(20, 0));
+        contentPane.setBackground(COLOR_FONDO);
+        contentPane.setBorder(null); 
+        contentPane.setLayout(new BorderLayout(0, 0));
         setContentPane(contentPane);
         
         if (medicoActual == null) {
@@ -72,223 +84,305 @@ public class PrincipalMedico extends JFrame {
             return; 
         }
 
-        // ==================================================
-        // PANEL IZQUIERDO: AGENDA (Misma posición, Nuevo Estilo)
-        // ==================================================
         JPanel panelAgenda = new JPanel();
-        panelAgenda.setPreferredSize(new Dimension(420, 0));
-        panelAgenda.setLayout(new BorderLayout(0, 15));
-        panelAgenda.setBackground(COLOR_BG_MAIN);
+        panelAgenda.setPreferredSize(new Dimension(450, 0)); 
+        panelAgenda.setLayout(new BorderLayout(0, 0));
+        panelAgenda.setBackground(COLOR_BLANCO);
+        panelAgenda.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, new Color(220, 220, 220)));
         contentPane.add(panelAgenda, BorderLayout.WEST);
         
-        // --- Encabezado Agenda ---
-        JPanel pnlHeaderAgenda = new JPanel(new BorderLayout());
-        pnlHeaderAgenda.setBackground(COLOR_BG_MAIN);
-        // Borde inferior turquesa para decorar
-        pnlHeaderAgenda.setBorder(new MatteBorder(0, 0, 2, 0, COLOR_THEME)); 
+        JPanel pnlHeaderAgenda = new JPanel(new BorderLayout(0, 15));
+        pnlHeaderAgenda.setBackground(COLOR_TEAL_MAIN); 
+        pnlHeaderAgenda.setBorder(new EmptyBorder(20, 20, 20, 20));
         
-        JLabel lblTituloAgenda = new JLabel("Agenda de Hoy");
+        JLabel lblTituloAgenda = new JLabel("MI AGENDA");
         lblTituloAgenda.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        lblTituloAgenda.setForeground(COLOR_TEXT_HEADER);
-        pnlHeaderAgenda.add(lblTituloAgenda, BorderLayout.WEST);
+        lblTituloAgenda.setForeground(COLOR_BLANCO);
+        pnlHeaderAgenda.add(lblTituloAgenda, BorderLayout.NORTH);
         
-        // Fecha formateada bonita (ej. "21 de Noviembre")
-        String fechaStr = LocalDate.now().format(DateTimeFormatter.ofPattern("dd 'de' MMMM"));
-        JLabel lblFecha = new JLabel(fechaStr);
-        lblFecha.setFont(new Font("Segoe UI", Font.ITALIC, 14));
-        lblFecha.setForeground(Color.GRAY);
-        lblFecha.setHorizontalAlignment(SwingConstants.RIGHT);
-        pnlHeaderAgenda.add(lblFecha, BorderLayout.EAST);
+        JPanel pnlFecha = new JPanel(new BorderLayout(10, 0));
+        pnlFecha.setOpaque(false); 
         
-        panelAgenda.add(pnlHeaderAgenda, BorderLayout.NORTH);
+        JLabel lblVerFecha = new JLabel("Ver fecha:");
+        lblVerFecha.setForeground(COLOR_BLANCO);
+        lblVerFecha.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        pnlFecha.add(lblVerFecha, BorderLayout.WEST);
         
-        // --- Tabla Estilizada ---
-        String[] headers = {"Hora", "Paciente / Visitante", "ID Cita"};
-        modelAgenda = new DefaultTableModel();
-        modelAgenda.setColumnIdentifiers(headers);
-        
-        tableAgenda = new JTable(modelAgenda);
-        tableAgenda.setRowHeight(40); // Filas más altas para mejor lectura
-        tableAgenda.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        tableAgenda.setSelectionBackground(new Color(230, 248, 245)); // Fondo selección suave
-        tableAgenda.setSelectionForeground(Color.BLACK);
-        tableAgenda.setGridColor(new Color(240, 240, 240));
-        tableAgenda.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tableAgenda.setShowVerticalLines(false);
-        
-        // Estilizar Cabecera de la Tabla
-        JTableHeader header = tableAgenda.getTableHeader();
-        header.setBackground(COLOR_THEME);
-        header.setForeground(Color.WHITE);
-        header.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        header.setOpaque(true);
-        
-        // Ocultar columna ID visualmente
-        tableAgenda.getColumnModel().getColumn(2).setMinWidth(0);
-        tableAgenda.getColumnModel().getColumn(2).setMaxWidth(0);
-        tableAgenda.getColumnModel().getColumn(2).setWidth(0);
-        
-        // Ajustar ancho de hora
-        tableAgenda.getColumnModel().getColumn(0).setMaxWidth(80);
-        tableAgenda.getColumnModel().getColumn(0).setPreferredWidth(80);
-        
-        JScrollPane scrollAgenda = new JScrollPane(tableAgenda);
-        scrollAgenda.setBorder(new LineBorder(new Color(230, 230, 230), 1));
-        scrollAgenda.getViewport().setBackground(Color.WHITE);
-        panelAgenda.add(scrollAgenda, BorderLayout.CENTER);
-        
-        // --- Botón Cerrar Sesión (Estilizado Rojo) ---
-        JButton btnCerrarSesion = new JButton("CERRAR SESIÓN");
-        btnCerrarSesion.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnCerrarSesion.setBackground(COLOR_LOGOUT);
-        btnCerrarSesion.setForeground(Color.WHITE);
-        btnCerrarSesion.setFocusPainted(false);
-        btnCerrarSesion.setBorderPainted(false);
-        btnCerrarSesion.setPreferredSize(new Dimension(0, 40));
-        
-        btnCerrarSesion.addActionListener(e -> {
-            int confirm = JOptionPane.showConfirmDialog(this, "¿Salir del sistema?", "Cerrar Sesión", JOptionPane.YES_NO_OPTION);
-            if (confirm == JOptionPane.YES_OPTION) {
-                dispose();
-                new Login().setVisible(true);
+        spnFechaAgenda = new JSpinner(new SpinnerDateModel());
+        spnFechaAgenda.setEditor(new JSpinner.DateEditor(spnFechaAgenda, "dd/MM/yyyy"));
+        spnFechaAgenda.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        spnFechaAgenda.setBorder(BorderFactory.createEmptyBorder()); 
+        spnFechaAgenda.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                cargarCitasDeFechaSeleccionada();
             }
         });
-        panelAgenda.add(btnCerrarSesion, BorderLayout.SOUTH);
+        pnlFecha.add(spnFechaAgenda, BorderLayout.CENTER);
+        pnlHeaderAgenda.add(pnlFecha, BorderLayout.SOUTH);
         
-        // Listener Tabla
+        panelAgenda.add(pnlHeaderAgenda, BorderLayout.NORTH);
+
+        String[] headers = {"Hora", "Paciente", "Estado", "ID"};
+        modelAgenda = new DefaultTableModel(null, headers) {
+            public boolean isCellEditable(int row, int col) { return false; }
+        };
+        
+        tableAgenda = new JTable(modelAgenda);
+        tableAgenda.setRowHeight(40); 
+        tableAgenda.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        tableAgenda.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tableAgenda.setShowVerticalLines(false);
+        tableAgenda.setGridColor(new Color(240, 240, 240));
+        
+        tableAgenda.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
+        tableAgenda.getTableHeader().setBackground(new Color(245, 245, 245));
+        tableAgenda.getTableHeader().setForeground(COLOR_TEXTO_DARK);
+        tableAgenda.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
+        
+        tableAgenda.getColumnModel().getColumn(3).setMinWidth(0);
+        tableAgenda.getColumnModel().getColumn(3).setMaxWidth(0);
+        tableAgenda.getColumnModel().getColumn(3).setWidth(0);
+        
+        JScrollPane scrollAgenda = new JScrollPane(tableAgenda);
+        scrollAgenda.setBorder(null); 
+        scrollAgenda.getViewport().setBackground(COLOR_BLANCO);
+        panelAgenda.add(scrollAgenda, BorderLayout.CENTER);
+        
+        JPanel panelBotonesIzq = new JPanel();
+        panelBotonesIzq.setBackground(COLOR_BLANCO);
+        panelBotonesIzq.setLayout(new BorderLayout(0, 10));
+        panelBotonesIzq.setBorder(new EmptyBorder(20, 20, 20, 20));
+        panelAgenda.add(panelBotonesIzq, BorderLayout.SOUTH);
+        
+        JPanel pnlGestionBtns = new JPanel(new BorderLayout(0, 10));
+        pnlGestionBtns.setBackground(COLOR_BLANCO);
+        
+        btnAlertaCitasFuturas = new JButton("!!! VER CITAS PENDIENTES");
+        estilizarBoton(btnAlertaCitasFuturas, COLOR_ALERTA);
+        btnAlertaCitasFuturas.setVisible(false); 
+        btnAlertaCitasFuturas.addActionListener(e -> irAProximaCitaFutura());
+        pnlGestionBtns.add(btnAlertaCitasFuturas, BorderLayout.NORTH);
+        
+        JButton btnGestionAgenda = new JButton("GESTIONAR MI HORARIO");
+        estilizarBoton(btnGestionAgenda, COLOR_AZUL_INFO);
+        btnGestionAgenda.addActionListener(e -> abrirGestionAgenda());
+        pnlGestionBtns.add(btnGestionAgenda, BorderLayout.CENTER);
+        
+        panelBotonesIzq.add(pnlGestionBtns, BorderLayout.CENTER);
+        
+        JButton btnCerrarSesion = new JButton("CERRAR SESIÓN");
+        estilizarBoton(btnCerrarSesion, COLOR_ROJO_SALIR);
+        btnCerrarSesion.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int confirm = JOptionPane.showConfirmDialog(PrincipalMedico.this, 
+                        "¿Seguro que desea salir?", "Cerrar Sesión", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    dispose();
+                    Login login = new Login();
+                    login.setVisible(true);
+                }
+            }
+        });
+        panelBotonesIzq.add(btnCerrarSesion, BorderLayout.SOUTH);
+
         tableAgenda.getSelectionModel().addListSelectionListener(event -> {
             if (!event.getValueIsAdjusting() && tableAgenda.getSelectedRow() != -1) {
                 actualizarPanelDetalle();
             }
         });
 
-        // ==================================================
-        // PANEL DERECHO: DETALLE (Misma posición, Nuevo Estilo)
-        // ==================================================
-        JPanel panelDetalle = new JPanel();
-        panelDetalle.setBackground(Color.WHITE);
-        // Borde sutil gris alrededor del detalle
-        panelDetalle.setBorder(new LineBorder(new Color(230, 230, 230), 1, true)); 
-        panelDetalle.setLayout(null); 
-        contentPane.add(panelDetalle, BorderLayout.CENTER);
+        JPanel panelDerechoContainer = new JPanel();
+        panelDerechoContainer.setBackground(COLOR_FONDO);
+        panelDerechoContainer.setLayout(null); 
+        contentPane.add(panelDerechoContainer, BorderLayout.CENTER);
         
-        // --- Encabezado Detalle (Fondo Turquesa) ---
-        JPanel pnlHeaderDetalle = new JPanel();
-        pnlHeaderDetalle.setBounds(0, 0, 1000, 60); // Ancho suficiente
-        pnlHeaderDetalle.setBackground(COLOR_THEME);
-        pnlHeaderDetalle.setLayout(null);
-        panelDetalle.add(pnlHeaderDetalle);
+        panelCardDetalle = new JPanel();
+        panelCardDetalle.setBounds(50, 50, 600, 500); 
+        panelCardDetalle.setBackground(COLOR_BLANCO);
+        panelCardDetalle.setLayout(null);
+        panelCardDetalle.setBorder(new LineBorder(new Color(220, 220, 220), 1, true));
+        panelDerechoContainer.add(panelCardDetalle);
+        
+        JPanel pnlHeaderCard = new JPanel();
+        pnlHeaderCard.setBounds(0, 0, 600, 60);
+        pnlHeaderCard.setBackground(new Color(250, 250, 250));
+        pnlHeaderCard.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(230, 230, 230)));
+        pnlHeaderCard.setLayout(new BorderLayout());
+        panelCardDetalle.add(pnlHeaderCard);
         
         JLabel lblInfoTitulo = new JLabel("DETALLE DE LA CITA");
+        lblInfoTitulo.setHorizontalAlignment(SwingConstants.CENTER);
         lblInfoTitulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        lblInfoTitulo.setForeground(Color.WHITE);
-        lblInfoTitulo.setBounds(20, 0, 300, 60);
-        pnlHeaderDetalle.add(lblInfoTitulo);
+        lblInfoTitulo.setForeground(COLOR_TEAL_MAIN);
+        pnlHeaderCard.add(lblInfoTitulo, BorderLayout.CENTER);
         
-        JLabel lblDrName = new JLabel("Dr. " + medicoActual.getApellido());
-        lblDrName.setHorizontalAlignment(SwingConstants.RIGHT);
-        lblDrName.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        lblDrName.setForeground(new Color(225, 255, 250));
-        lblDrName.setBounds(300, 0, 300, 60); // Ajustar según ancho ventana
-        pnlHeaderDetalle.add(lblDrName);
+        JLabel lblAvatar = new JLabel();
+        lblAvatar.setHorizontalAlignment(SwingConstants.CENTER);
+        lblAvatar.setBounds(250, 80, 100, 100); 
+
+        String rutaA = "recursos/Paciente.png"; 
+        File archivoA = new File(rutaA);
         
-        // --- Datos ---
-        JLabel lblTagPaciente = new JLabel("PACIENTE:");
-        lblTagPaciente.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        lblTagPaciente.setForeground(Color.GRAY);
-        lblTagPaciente.setBounds(30, 100, 100, 20);
-        panelDetalle.add(lblTagPaciente);
+        boolean imagenCargada = false;
+
+        if (archivoA.exists()) {
+            cargarImagen(lblAvatar, rutaA);
+            imagenCargada = true;
+        } 
         
-        lblDetalleNombre = new JLabel("---");
-        lblDetalleNombre.setFont(new Font("Segoe UI", Font.PLAIN, 22)); // Letra grande
-        lblDetalleNombre.setForeground(COLOR_TEXT_BODY);
-        lblDetalleNombre.setBounds(30, 120, 400, 30);
-        panelDetalle.add(lblDetalleNombre);
+        if (!imagenCargada) {
+            lblAvatar.setText("PACIENTE");
+            lblAvatar.setFont(new Font("Segoe UI", Font.BOLD, 14));
+            lblAvatar.setForeground(Color.LIGHT_GRAY);
+            lblAvatar.setBorder(new LineBorder(Color.LIGHT_GRAY, 2, true));
+        }
+        panelCardDetalle.add(lblAvatar);
         
-        JLabel lblTagHora = new JLabel("HORA PROGRAMADA:");
-        lblTagHora.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        lblTagHora.setForeground(Color.GRAY);
-        lblTagHora.setBounds(30, 180, 150, 20);
-        panelDetalle.add(lblTagHora);
+        lblDetalleNombre = new JLabel("Seleccione un paciente");
+        lblDetalleNombre.setHorizontalAlignment(SwingConstants.CENTER);
+        lblDetalleNombre.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        lblDetalleNombre.setForeground(COLOR_TEXTO_DARK);
+        lblDetalleNombre.setBounds(50, 190, 500, 30);
+        panelCardDetalle.add(lblDetalleNombre);
         
-        lblDetalleHora = new JLabel("---");
-        lblDetalleHora.setFont(new Font("Segoe UI", Font.PLAIN, 22));
-        lblDetalleHora.setForeground(COLOR_TEXT_BODY);
-        lblDetalleHora.setBounds(30, 200, 300, 30);
-        panelDetalle.add(lblDetalleHora);
+        lblDetalleHora = new JLabel("--:--");
+        lblDetalleHora.setHorizontalAlignment(SwingConstants.CENTER);
+        lblDetalleHora.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+        lblDetalleHora.setForeground(Color.GRAY);
+        lblDetalleHora.setBounds(50, 225, 500, 25);
+        panelCardDetalle.add(lblDetalleHora);
         
-        // --- Botones de Acción (Centrados y Grandes) ---
         btnIniciarConsulta = new JButton("INICIAR CONSULTA");
-        btnIniciarConsulta.setBackground(COLOR_THEME);
-        btnIniciarConsulta.setForeground(Color.WHITE);
+        estilizarBoton(btnIniciarConsulta, COLOR_VERDE_ACCION);
         btnIniciarConsulta.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        btnIniciarConsulta.setFocusPainted(false);
-        btnIniciarConsulta.setBorderPainted(false);
+        btnIniciarConsulta.setBounds(100, 280, 400, 50);
         btnIniciarConsulta.setEnabled(false); 
-        btnIniciarConsulta.setBounds(150, 300, 300, 60); // Botón grande central
+        btnIniciarConsulta.addActionListener(e -> abrirTriaje());
+        panelCardDetalle.add(btnIniciarConsulta);
         
-        btnIniciarConsulta.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                abrirTriaje();
-            }
-        });
-        panelDetalle.add(btnIniciarConsulta);
-        
-        btnVerHistorial = new JButton("VER HISTORIAL CLÍNICO");
-        btnVerHistorial.setBackground(new Color(240, 240, 240)); // Gris claro
-        btnVerHistorial.setForeground(COLOR_TEXT_BODY);
+        btnVerHistorial = new JButton("Ver Historial Clínico");
+        btnVerHistorial.setBackground(COLOR_BLANCO);
+        btnVerHistorial.setForeground(COLOR_AZUL_INFO);
         btnVerHistorial.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnVerHistorial.setFocusPainted(false);
-        btnVerHistorial.setBorder(new LineBorder(Color.LIGHT_GRAY, 1)); // Borde sutil
-        btnVerHistorial.setEnabled(false); 
-        btnVerHistorial.setBounds(150, 380, 300, 40); // Debajo del principal
-
-        panelDetalle.add(btnVerHistorial);
+        btnVerHistorial.setBorder(new LineBorder(COLOR_AZUL_INFO, 2));
+        btnVerHistorial.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnVerHistorial.setBounds(100, 350, 400, 40);
+        btnVerHistorial.setEnabled(false);
         
-        btnVerHistorial.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                int row = tableAgenda.getSelectedRow();
-                if(row == -1) {
-                    JOptionPane.showMessageDialog(PrincipalMedico.this, "Seleccione una cita primero.");
-                    return;
+        btnVerHistorial.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                if(btnVerHistorial.isEnabled()) {
+                    btnVerHistorial.setBackground(COLOR_AZUL_INFO);
+                    btnVerHistorial.setForeground(Color.WHITE);
                 }
-                
-                String idCita = (String) modelAgenda.getValueAt(row, 2);
-                Cita cita = SistemaGestion.getInstance().buscarCitaPorId(idCita);
-                if (cita != null) {
-                    Paciente paciente = SistemaGestion.getInstance().buscarPacientePorId(cita.getIdPaciente());
-                    if (paciente != null) {
-                        HistorialPaciente historial = new HistorialPaciente(paciente, medicoActual);
-                        historial.setVisible(true);
-                    } else {
-                        JOptionPane.showMessageDialog(PrincipalMedico.this, "Este es un visitante nuevo (Sin historial).");
-                    }
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                if(btnVerHistorial.isEnabled()) {
+                    btnVerHistorial.setBackground(Color.WHITE);
+                    btnVerHistorial.setForeground(COLOR_AZUL_INFO);
                 }
             }
         });
+        btnVerHistorial.addActionListener(e -> verHistorial());
+        panelCardDetalle.add(btnVerHistorial);
         
-        cargarCitasDelDia();
+        cargarCitasDeFechaSeleccionada();
+        
+        verificarCitasFuturas();
     }
     
-    private void cargarCitasDelDia() {
-        modelAgenda.setRowCount(0);
+    private void verificarCitasFuturas() {
         LocalDate hoy = LocalDate.now();
-        ArrayList<Cita> agendaMedico = medicoActual.getAgenda();
+        int citasPendientesFuturas = 0;
         
-        if (agendaMedico == null) return;
+        for (Cita c : SistemaGestion.getInstance().getListaCitas()) {
+            if(c.getMedico().getId().equals(medicoActual.getId()) && 
+               c.getEstado().equalsIgnoreCase("pendiente") &&
+               c.getFechaCitada().toLocalDate().isAfter(hoy)) {
+                citasPendientesFuturas++;
+            }
+        }
+        
+        if(citasPendientesFuturas > 0) {
+            btnAlertaCitasFuturas.setText("!!! " + citasPendientesFuturas + " CITAS FUTURAS");
+            btnAlertaCitasFuturas.setVisible(true);
+        } else {
+            btnAlertaCitasFuturas.setVisible(false);
+        }
+    }
+    
+    private void irAProximaCitaFutura() {
+        LocalDate hoy = LocalDate.now();
+        LocalDate fechaMasProxima = null;
+        
+        for (Cita c : SistemaGestion.getInstance().getListaCitas()) {
+            if(c.getMedico().getId().equals(medicoActual.getId()) && 
+               c.getEstado().equalsIgnoreCase("pendiente") &&
+               c.getFechaCitada().toLocalDate().isAfter(hoy)) {
+                
+                LocalDate fechaCita = c.getFechaCitada().toLocalDate();
+                if (fechaMasProxima == null || fechaCita.isBefore(fechaMasProxima)) {
+                    fechaMasProxima = fechaCita;
+                }
+            }
+        }
+        
+        if (fechaMasProxima != null) {
+            Date date = Date.from(fechaMasProxima.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            spnFechaAgenda.setValue(date);
+        }
+    }
 
-        for (Cita c : agendaMedico) {
-            if (c != null && c.getFechaCitada() != null && c.getEstado() != null) {
-                if (c.getFechaCitada().toLocalDate().equals(hoy) && c.getEstado().equalsIgnoreCase("pendiente")) {
+    private void cargarImagen(JLabel lbl, String ruta) {
+        ImageIcon iconOriginal = new ImageIcon(ruta);
+        Image imgEscalada = iconOriginal.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+        lbl.setIcon(new ImageIcon(imgEscalada));
+    }
+    
+    private void estilizarBoton(JButton btn, Color colorBg) {
+        btn.setBackground(colorBg);
+        btn.setForeground(Color.WHITE);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    }
+    
+    private void abrirGestionAgenda() {
+        FormGestionAgenda gestion = new FormGestionAgenda(medicoActual);
+        gestion.setVisible(true);
+        cargarCitasDeFechaSeleccionada();
+    }
+    
+    private void cargarCitasDeFechaSeleccionada() {
+        modelAgenda.setRowCount(0);
+        Date date = (Date) spnFechaAgenda.getValue();
+        LocalDate fechaSeleccionada = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        
+        ArrayList<Cita> todasLasCitas = SistemaGestion.getInstance().getListaCitas();
+        
+        for (Cita c : todasLasCitas) {
+            if(c.getMedico().getId().equals(medicoActual.getId())) {
+                if (c.getFechaCitada().toLocalDate().equals(fechaSeleccionada) && !c.getEstado().equalsIgnoreCase("Cancelada")) {
                     Object[] fila = {
                         c.getFechaCitada().toLocalTime().toString(),
                         c.getNameVisitante(),
+                        c.getEstado().toUpperCase(),
                         c.getId()
                     };
                     modelAgenda.addRow(fila);
                 }
             }
         }
+        
+        lblDetalleNombre.setText("Seleccione un paciente");
+        lblDetalleNombre.setForeground(Color.GRAY);
+        lblDetalleHora.setText("--:--");
+        btnIniciarConsulta.setEnabled(false);
+        btnVerHistorial.setEnabled(false);
+        
+        verificarCitasFuturas();
     }
     
     private void actualizarPanelDetalle() {
@@ -296,30 +390,51 @@ public class PrincipalMedico extends JFrame {
         if (row != -1) {
             String nombre = (String) modelAgenda.getValueAt(row, 1);
             String hora = (String) modelAgenda.getValueAt(row, 0);
+            String estado = (String) modelAgenda.getValueAt(row, 2);
             
             lblDetalleNombre.setText(nombre);
-            lblDetalleHora.setText(hora);
-            btnIniciarConsulta.setEnabled(true);
+            lblDetalleNombre.setForeground(COLOR_TEXTO_DARK);
+            lblDetalleHora.setText("Hora de cita: " + hora + "  |  Estado: " + estado);
+            
+            boolean esPendiente = estado.equalsIgnoreCase("PENDIENTE");
+            btnIniciarConsulta.setEnabled(esPendiente);
+            if(esPendiente) {
+                btnIniciarConsulta.setBackground(COLOR_VERDE_ACCION);
+                btnIniciarConsulta.setText("INICIAR CONSULTA");
+            } else {
+                btnIniciarConsulta.setBackground(Color.LIGHT_GRAY);
+                btnIniciarConsulta.setText("CONSULTA " + estado);
+            }
+            
             btnVerHistorial.setEnabled(true);
         }
     }
     
     private void abrirTriaje() {
         int row = tableAgenda.getSelectedRow();
-        if(row == -1) {
-            JOptionPane.showMessageDialog(this, "Debe seleccionar una cita primero.");
-            return;
-        }
-        String idCita = (String) modelAgenda.getValueAt(row, 2);
+        if(row == -1) return;
+        String idCita = (String) modelAgenda.getValueAt(row, 3); 
         FormTriaje triaje = new FormTriaje(idCita, this);
         triaje.setVisible(true);
     }
     
+    private void verHistorial() {
+        int row = tableAgenda.getSelectedRow();
+        if(row == -1) return;
+        String idCita = (String) modelAgenda.getValueAt(row, 3);
+        
+        Cita cita = SistemaGestion.getInstance().buscarCitaPorId(idCita);
+        if (cita != null) {
+            Paciente paciente = SistemaGestion.getInstance().buscarPacientePorId(cita.getIdPaciente());
+            if (paciente != null) {
+                HistorialPaciente historial = new HistorialPaciente(paciente, medicoActual);
+                historial.setVisible(true);
+            } else {
+                JOptionPane.showMessageDialog(this, "Paciente nuevo, sin historial previo en sistema.");
+            }
+        }
+    }
     public void refrescarAgenda() {
-        cargarCitasDelDia();
-        lblDetalleNombre.setText("---");
-        lblDetalleHora.setText("---");
-        btnIniciarConsulta.setEnabled(false);
-        btnVerHistorial.setEnabled(false);
+        cargarCitasDeFechaSeleccionada();
     }
 }

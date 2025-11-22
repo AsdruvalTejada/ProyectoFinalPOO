@@ -116,9 +116,8 @@ public class FormAsignarMedicos extends JDialog {
             JCheckBox chk = new JCheckBox(m.getId() + " - Dr. " + m.getApellido() + " (" + m.getEspecialidad() + ")");
             chk.setFont(new Font("Segoe UI", Font.PLAIN, 14));
             chk.setBackground(Color.WHITE);
-            chk.setName(m.getId()); // Guardamos el ID en el nombre del componente
+            chk.setName(m.getId()); 
             
-            // Si ya está asignado, marcarlo
             if(yaAsignados.contains(m)) {
                 chk.setSelected(true);
             }

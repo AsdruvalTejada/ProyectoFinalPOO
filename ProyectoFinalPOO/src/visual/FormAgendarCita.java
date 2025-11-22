@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -16,6 +17,7 @@ import java.util.Date;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -23,14 +25,17 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerDateModel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.MaskFormatter;
 
 import logico.Cita;
 import logico.Medico;
 import logico.Paciente;
+import logico.Secretaria;
 import logico.SistemaGestion;
 
 @SuppressWarnings("serial")
@@ -38,7 +43,7 @@ public class FormAgendarCita extends JDialog {
 
     private final JPanel contentPanel = new JPanel();
     private JTextField txtCodigo;
-    private JTextField txtCedula;
+    private JFormattedTextField txtCedula;
     private JTextField txtNombre;
     private JTextField txtApellido;
 
@@ -51,6 +56,7 @@ public class FormAgendarCita extends JDialog {
     private LocalDate fechaSeleccionada;
     private Paciente pacientePreseleccionado;
     private Cita citaEditar;
+    private Secretaria secretariaContexto;
     private boolean modoSeleccionFecha = false; 
     
     private final Color COLOR_FONDO       = new Color(254, 251, 246);
@@ -59,9 +65,10 @@ public class FormAgendarCita extends JDialog {
     private final Color COLOR_TEXTO       = new Color(50, 50, 50);
     private final Color COLOR_BLOQUEADO   = new Color(230, 230, 230);
 
-    public FormAgendarCita(LocalDate fechaIn, Cita citaIn) {
+    public FormAgendarCita(LocalDate fechaIn, Cita citaIn, Secretaria secre) {
         this.fechaSeleccionada = fechaIn;
         this.citaEditar = citaIn;
+        this.secretariaContexto = secre;
         this.pacientePreseleccionado = null;
         this.modoSeleccionFecha = false;
         
@@ -69,8 +76,13 @@ public class FormAgendarCita extends JDialog {
     }
 
     public FormAgendarCita(Paciente pacienteIn) {
+        this(pacienteIn, null);
+    }
+
+    public FormAgendarCita(Paciente pacienteIn, Secretaria secre) {
         this.fechaSeleccionada = LocalDate.now();
         this.citaEditar = null;
+        this.secretariaContexto = secre;
         this.pacientePreseleccionado = pacienteIn;
         this.modoSeleccionFecha = true;
         
@@ -121,7 +133,7 @@ public class FormAgendarCita extends JDialog {
         txtCodigo.setBackground(COLOR_BLOQUEADO);
         txtCodigo.setFont(new Font("Segoe UI", Font.BOLD, 12));
         txtCodigo.setBounds(120, 20, 150, 25);
-        txtCodigo.setText("C-" + (SistemaGestion.genIdCita + 1)); 
+        txtCodigo.setText("C-" + (SistemaGestion.getInstance().getGenIdCita() + 1)); 
         panelForm.add(txtCodigo);
 
         JLabel lblCedula = new JLabel("Cédula:");
@@ -129,7 +141,22 @@ public class FormAgendarCita extends JDialog {
         lblCedula.setBounds(30, 60, 80, 25);
         panelForm.add(lblCedula);
 
-        txtCedula = new JTextField();
+        try {
+            MaskFormatter mascaraCedula = new MaskFormatter("###-#######-#");
+            mascaraCedula.setPlaceholderCharacter('_');
+            txtCedula = new JFormattedTextField(mascaraCedula);
+            
+            // Lógica para mover el foco automáticamente al terminar de escribir la cédula
+            // Se puede usar un CaretListener o FocusListener, aquí una implementación simple
+            // que solicita foco en 'txtNombre' si el campo se llena.
+            // Nota: Para JFormattedTextField con máscara, es más seguro dejar que el usuario presione TAB
+            // o usar un DocumentListener complejo.
+            // Sin embargo, para asegurar que el cursor INICIAL no esté en el código, hacemos esto:
+            
+        } catch (ParseException e) {
+            txtCedula = new JFormattedTextField(); 
+        }
+        
         txtCedula.setBounds(120, 60, 200, 25);
         txtCedula.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         panelForm.add(txtCedula);
@@ -159,6 +186,7 @@ public class FormAgendarCita extends JDialog {
         lblFecha.setForeground(COLOR_TEAL);
         lblFecha.setBounds(30, 150, 80, 25);
         panelForm.add(lblFecha);
+        
         if (modoSeleccionFecha) {
             spnFecha = new JSpinner(new SpinnerDateModel());
             spnFecha.setEditor(new JSpinner.DateEditor(spnFecha, "dd/MM/yyyy"));
@@ -237,7 +265,21 @@ public class FormAgendarCita extends JDialog {
         btnCancelar.setFocusPainted(false);
         btnCancelar.addActionListener(e -> dispose());
         panelBotones.add(btnCancelar);
+        
         cargarMedicos();
+
+        // Lógica de foco inicial
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowOpened(java.awt.event.WindowEvent e) {
+                if (pacientePreseleccionado == null) {
+                    // Si no hay paciente, foco en Cédula
+                    txtCedula.requestFocus();
+                } else {
+                    // Si ya hay paciente, foco en Médico
+                    cbxMedico.requestFocus();
+                }
+            }
+        });
 
         if (this.pacientePreseleccionado != null) {
             txtCedula.setText(pacientePreseleccionado.getId());
@@ -264,7 +306,15 @@ public class FormAgendarCita extends JDialog {
 
     private void cargarMedicos() {
         cbxMedico.removeAllItems();
-        for (Medico m : SistemaGestion.getInstance().getListaMedicos()) {
+        
+        ArrayList<Medico> medicosAMostrar;
+        if (secretariaContexto != null) {
+            medicosAMostrar = secretariaContexto.getMedicosAsignados();
+        } else {
+            medicosAMostrar = SistemaGestion.getInstance().getListaMedicos();
+        }
+        
+        for (Medico m : medicosAMostrar) {
             cbxMedico.addItem(m); 
         }
         cbxMedico.setSelectedIndex(-1);
@@ -293,7 +343,9 @@ public class FormAgendarCita extends JDialog {
     }
     
     private void guardarCita() {
-        if (txtCedula.getText().isEmpty() || txtNombre.getText().isEmpty()) {
+        String cedulaLimpia = txtCedula.getText().replace("-", "").replace("_", "").trim();
+        
+        if (cedulaLimpia.isEmpty() || txtNombre.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Faltan datos del paciente.", "Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
