@@ -40,7 +40,7 @@ public class FormRegMedico extends JDialog {
     private JTextField txtNombre;
     private JTextField txtApellido;
     private JFormattedTextField txtTelefono;
-    private JComboBox<String> cbxEspecialidad; // CAMBIO: JComboBox
+    private JComboBox<String> cbxEspecialidad;
     private JSpinner spnFechaNac;
     private JComboBox<String> cbxSexo;
     private JSpinner spnDuracion;
@@ -52,7 +52,6 @@ public class FormRegMedico extends JDialog {
     private final Color COLOR_VERDE_BOTON = new Color(0, 168, 107);
     private final Color COLOR_TEXTO = new Color(60, 60, 60);
 
-    // Lista predefinida de especialidades para evitar errores de escritura
     private final String[] LISTA_ESPECIALIDADES = {
         "Seleccione...", 
         "Medicina General",
@@ -138,7 +137,6 @@ public class FormRegMedico extends JDialog {
         cbxSexo.setBounds(390, 100, 100, 25);
         panelForm.add(cbxSexo);
 
-        // --- TELÉFONO CON MÁSCARA ---
         crearLabel("Teléfono:", 30, 140, panelForm);
         try {
             MaskFormatter mascaraTel = new MaskFormatter("###-###-####");
@@ -219,7 +217,6 @@ public class FormRegMedico extends JDialog {
         btnCancelar.addActionListener(e -> dispose());
         panelBotones.add(btnCancelar);
         
-        // Lógica de inicialización
         if (this.medicoEdicion == null) {
             generarNuevoId();
         } else {
@@ -275,7 +272,6 @@ public class FormRegMedico extends JDialog {
 
     private void gestionarGuardado() {
         String telefono = txtTelefono.getText();
-        // Validar que seleccionaron especialidad
         if (txtNombre.getText().isEmpty() || txtApellido.getText().isEmpty() || 
             cbxEspecialidad.getSelectedIndex() == 0 || telefono.contains("_")) {
             JOptionPane.showMessageDialog(this, "Por favor complete todos los campos.", "Campos Vacíos", JOptionPane.WARNING_MESSAGE);
@@ -293,7 +289,6 @@ public class FormRegMedico extends JDialog {
             String apellido = txtApellido.getText();
             String contacto = txtTelefono.getText();
             
-            // CAMBIO: Obtener especialidad del ComboBox
             String especialidad = (String) cbxEspecialidad.getSelectedItem();
             
             String sexo = (String) cbxSexo.getSelectedItem();
