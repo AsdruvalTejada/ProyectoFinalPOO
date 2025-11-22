@@ -48,6 +48,22 @@ public class SistemaGestion {
 		registrarMedico(medPrueba);
 		crearUsuarioMedico(medPrueba, "doc", "123");
 		
+		if (catalogoEnfermedades.isEmpty()) {
+            agregarEnfermedadCatalogo(new Enfermedad("ENF-001", "Gripe Estacional", false));
+            agregarEnfermedadCatalogo(new Enfermedad("ENF-002", "COVID-19", true)); 
+            agregarEnfermedadCatalogo(new Enfermedad("ENF-003", "Dengue", true)); 
+            agregarEnfermedadCatalogo(new Enfermedad("ENF-004", "Hipertensión", false));
+            agregarEnfermedadCatalogo(new Enfermedad("ENF-005", "Diabetes Tipo 2", false));
+            agregarEnfermedadCatalogo(new Enfermedad("ENF-006", "Amigdalitis", false));
+        }
+        if (catalogoVacunas.isEmpty()) {
+            agregarVacuna(new Vacuna("VAC-001", "DT (Tétanos y Difteria)"));
+            agregarVacuna(new Vacuna("VAC-002", "Influenza Estacional"));
+            agregarVacuna(new Vacuna("VAC-003", "Hepatitis B"));
+            agregarVacuna(new Vacuna("VAC-004", "Pfizer (COVID-19)"));
+            agregarVacuna(new Vacuna("VAC-005", "Sinovac (COVID-19)"));
+        }
+		
 	}
 
 	public static SistemaGestion getInstance(){
