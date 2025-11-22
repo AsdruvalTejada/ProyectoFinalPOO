@@ -28,6 +28,7 @@ import javax.swing.JFrame;
 
 import logico.Cita;
 import logico.Medico;
+import logico.Secretaria;
 import logico.SistemaGestion;
 
 @SuppressWarnings("serial")
@@ -36,19 +37,23 @@ public class CalendarioSecretaria extends JPanel {
     private JPanel panelDias;
     private JLabel lblMesAnio;
     private YearMonth mesActual;
+    private Secretaria secretariaLogueada;
+
     private final Color COLOR_TEAL_PRINCIPAL = new Color(10, 186, 181);
     private final Color COLOR_FONDO_BLANCO   = Color.WHITE;
     private final Color COLOR_TEXTO_OSCURO   = new Color(50, 50, 50);
     private final Color COLOR_TEXTO_BLANCO   = Color.WHITE;
     private final Color COLOR_ROJO_CERRAR    = new Color(255, 80, 80);
-    
     private final Color COLOR_CELDA_HOY      = new Color(220, 245, 244); 
     private final Color COLOR_CELDA_CITA     = new Color(0, 200, 151);
     private final Color COLOR_CELDA_PASADO   = new Color(245, 245, 245); 
 
-    public CalendarioSecretaria() {
+    public CalendarioSecretaria(Secretaria secre) {
+        this.secretariaLogueada = secre;
+        
         setLayout(new BorderLayout(0, 0));
         setBackground(COLOR_FONDO_BLANCO);
+
         JPanel panelLateral = new JPanel();
         panelLateral.setPreferredSize(new Dimension(240, 0)); 
         panelLateral.setBackground(COLOR_TEAL_PRINCIPAL);
@@ -62,14 +67,14 @@ public class CalendarioSecretaria extends JPanel {
         lblRol.setBounds(0, 30, 240, 30);
         panelLateral.add(lblRol);
         
-        JLabel lblSubtitulo = new JLabel("Gestión de Agenda");
-        lblSubtitulo.setHorizontalAlignment(SwingConstants.CENTER);
-        lblSubtitulo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        lblSubtitulo.setForeground(new Color(200, 255, 250)); 
-        lblSubtitulo.setBounds(0, 60, 240, 20);
-        panelLateral.add(lblSubtitulo);
+        JLabel lblNombreSec = new JLabel(secre != null ? secre.getName() : "");
+        lblNombreSec.setHorizontalAlignment(SwingConstants.CENTER);
+        lblNombreSec.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblNombreSec.setForeground(new Color(200, 255, 250)); 
+        lblNombreSec.setBounds(0, 60, 240, 20);
+        panelLateral.add(lblNombreSec);
         
-        JLabel lblTituloMedicos = new JLabel("MÉDICOS DISPONIBLES");
+        JLabel lblTituloMedicos = new JLabel("MIS MÉDICOS ASIGNADOS");
         lblTituloMedicos.setHorizontalAlignment(SwingConstants.LEFT);
         lblTituloMedicos.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblTituloMedicos.setForeground(COLOR_TEXTO_BLANCO);
@@ -83,13 +88,23 @@ public class CalendarioSecretaria extends JPanel {
         panelLateral.add(panelListaMedicos);
         
         int yPos = 15;
-        for(Medico m : SistemaGestion.getInstance().getListaMedicos()) {
-            JLabel lblMed = new JLabel("- Dr. " + m.getApellido());
-            lblMed.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-            lblMed.setForeground(COLOR_TEXTO_BLANCO);
-            lblMed.setBounds(15, yPos, 180, 20);
-            panelListaMedicos.add(lblMed);
-            yPos += 30;
+        ArrayList<Medico> misMedicos = (secre != null) ? secre.getMedicosAsignados() : new ArrayList<>();
+        
+        if(misMedicos.isEmpty()) {
+            JLabel lblVacio = new JLabel("<html>Sin médicos asignados.<br>Contacte al Admin.</html>");
+            lblVacio.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+            lblVacio.setForeground(new Color(230, 230, 230));
+            lblVacio.setBounds(15, 15, 180, 40);
+            panelListaMedicos.add(lblVacio);
+        } else {
+            for(Medico m : misMedicos) {
+                JLabel lblMed = new JLabel("- Dr. " + m.getApellido());
+                lblMed.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+                lblMed.setForeground(COLOR_TEXTO_BLANCO);
+                lblMed.setBounds(15, yPos, 180, 20);
+                panelListaMedicos.add(lblMed);
+                yPos += 30;
+            }
         }
         
         JButton btnBuscarPaciente = new JButton("BUSCAR PACIENTE");
@@ -100,7 +115,7 @@ public class CalendarioSecretaria extends JPanel {
         btnBuscarPaciente.setBorderPainted(false); 
         btnBuscarPaciente.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnBuscarPaciente.setBounds(20, 550, 200, 40);
-
+        
         btnBuscarPaciente.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent e) {
                 btnBuscarPaciente.setBackground(Color.WHITE);
@@ -111,6 +126,7 @@ public class CalendarioSecretaria extends JPanel {
                 btnBuscarPaciente.setForeground(COLOR_TEXTO_BLANCO);
             }
         });
+        
         btnBuscarPaciente.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 FormBuscarPaciente buscador = new FormBuscarPaciente();
@@ -118,7 +134,6 @@ public class CalendarioSecretaria extends JPanel {
                 refrescarCalendario();
             }
         });
-        
         panelLateral.add(btnBuscarPaciente);
         
         JButton btnCerrarSesion = new JButton("CERRAR SESIÓN");
@@ -136,6 +151,7 @@ public class CalendarioSecretaria extends JPanel {
             }
         });
         panelLateral.add(btnCerrarSesion);
+
         JPanel panelCalendarioContenedor = new JPanel();
         panelCalendarioContenedor.setLayout(new BorderLayout(0, 20));
         panelCalendarioContenedor.setBackground(COLOR_FONDO_BLANCO);
@@ -160,7 +176,6 @@ public class CalendarioSecretaria extends JPanel {
             mesActual = mesActual.minusMonths(1); 
             construirCalendario(mesActual); 
         });
-        
         btnSig.addActionListener(e -> { 
             mesActual = mesActual.plusMonths(1); 
             construirCalendario(mesActual); 
@@ -190,7 +205,6 @@ public class CalendarioSecretaria extends JPanel {
         btn.setFocusPainted(false);
         btn.setPreferredSize(new Dimension(50, 35)); 
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        
         btn.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent e) {
                 btn.setBackground(COLOR_TEAL_PRINCIPAL);
@@ -205,17 +219,10 @@ public class CalendarioSecretaria extends JPanel {
     }
     
     private void cerrarSesion() {
-        int confirm = JOptionPane.showConfirmDialog(this, 
-                "¿Está segura de que desea cerrar sesión?", 
-                "Cerrar Sesión", 
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE);
-        
+        int confirm = JOptionPane.showConfirmDialog(this, "¿Desea cerrar sesión?", "Salir", JOptionPane.YES_NO_OPTION);
         if(confirm == JOptionPane.YES_OPTION) {
             JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-            if (topFrame != null) {
-                topFrame.dispose();
-            }
+            if (topFrame != null) topFrame.dispose();
             Login login = new Login();
             login.setVisible(true);
         }
@@ -223,7 +230,6 @@ public class CalendarioSecretaria extends JPanel {
 
     private void construirCalendario(YearMonth mes) {
         panelDias.removeAll(); 
-
         String mesNombre = mes.getMonth().getDisplayName(TextStyle.FULL, new Locale("es", "ES"));
         lblMesAnio.setText((mesNombre + " " + mes.getYear()).toUpperCase());
 
@@ -251,7 +257,6 @@ public class CalendarioSecretaria extends JPanel {
 
         for (int dia = 1; dia <= diasEnMes; dia++) {
             LocalDate fechaCelda = mes.atDay(dia);
-            
             JPanel celda = new JPanel();
             celda.setLayout(new BorderLayout());
             celda.setBackground(Color.WHITE);
@@ -278,13 +283,21 @@ public class CalendarioSecretaria extends JPanel {
                 indicador.setPreferredSize(new Dimension(5, 0));
                 celda.add(indicador, BorderLayout.WEST);
                 
-                String textoInfo = "<html><div style='padding:5px; color:#00a86b'>";
-                textoInfo += "<b>" + citasDelDia.size() + " Citas</b>";
-                textoInfo += "</div></html>";
+                int contadorMios = 0;
+                for(Cita c : citasDelDia) {
+                    if(secretariaLogueada != null && secretariaLogueada.getMedicosAsignados().contains(c.getMedico())) {
+                        contadorMios++;
+                    } else if (secretariaLogueada == null) {
+                        contadorMios++;
+                    }
+                }
                 
-                JLabel lblInfo = new JLabel(textoInfo, SwingConstants.CENTER);
-                lblInfo.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-                celda.add(lblInfo, BorderLayout.CENTER);
+                if(contadorMios > 0) {
+                    String textoInfo = "<html><div style='padding:5px; color:#00a86b'><b>" + contadorMios + " Citas</b></div></html>";
+                    JLabel lblInfo = new JLabel(textoInfo, SwingConstants.CENTER);
+                    lblInfo.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+                    celda.add(lblInfo, BorderLayout.CENTER);
+                }
             }
 
             if (fechaCelda.isBefore(hoy)) {
@@ -306,20 +319,17 @@ public class CalendarioSecretaria extends JPanel {
                     }
                 });
             }
-
             panelDias.add(celda);
         }
-
         panelDias.revalidate();
         panelDias.repaint();
     }
 
     private ArrayList<Cita> buscarCitasEnFecha(LocalDate fecha) {
         ArrayList<Cita> encontradas = new ArrayList<>();
-        
         for (Cita c : SistemaGestion.getInstance().getListaCitas()) {
-            if (c != null && c.getFechaCitada() != null && c.getEstado() != null) {    
-                if (c.getFechaCitada().toLocalDate().equals(fecha) && !c.getEstado().equalsIgnoreCase("Cancelada")) {
+            if (c.getFechaCitada().toLocalDate().equals(fecha) && !c.getEstado().equalsIgnoreCase("Cancelada")) {
+                if(secretariaLogueada == null || secretariaLogueada.getMedicosAsignados().contains(c.getMedico())) {
                     encontradas.add(c);
                 }
             }
@@ -328,7 +338,7 @@ public class CalendarioSecretaria extends JPanel {
     }
 
     private void abrirOpcionesDia(LocalDate fecha, boolean tieneCitaPrevia) {
-        FormOpcionesDia dialog = new FormOpcionesDia(fecha, tieneCitaPrevia, this);
+        FormOpcionesDia dialog = new FormOpcionesDia(fecha, tieneCitaPrevia, this, secretariaLogueada);
         dialog.setVisible(true);
         refrescarCalendario();
     }
