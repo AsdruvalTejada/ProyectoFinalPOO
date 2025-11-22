@@ -31,6 +31,7 @@ import javax.swing.event.ChangeListener;
 import logico.Cita;
 import logico.Medico;
 import logico.Paciente;
+import logico.Secretaria;
 import logico.SistemaGestion;
 
 @SuppressWarnings("serial")
@@ -51,6 +52,7 @@ public class FormAgendarCita extends JDialog {
     private LocalDate fechaSeleccionada;
     private Paciente pacientePreseleccionado;
     private Cita citaEditar;
+    private Secretaria secretariaContexto;
     private boolean modoSeleccionFecha = false; 
     
     private final Color COLOR_FONDO       = new Color(254, 251, 246);
@@ -59,9 +61,10 @@ public class FormAgendarCita extends JDialog {
     private final Color COLOR_TEXTO       = new Color(50, 50, 50);
     private final Color COLOR_BLOQUEADO   = new Color(230, 230, 230);
 
-    public FormAgendarCita(LocalDate fechaIn, Cita citaIn) {
+    public FormAgendarCita(LocalDate fechaIn, Cita citaIn, Secretaria secre) {
         this.fechaSeleccionada = fechaIn;
         this.citaEditar = citaIn;
+        this.secretariaContexto = secre;
         this.pacientePreseleccionado = null;
         this.modoSeleccionFecha = false;
         
@@ -69,8 +72,13 @@ public class FormAgendarCita extends JDialog {
     }
 
     public FormAgendarCita(Paciente pacienteIn) {
+        this(pacienteIn, null);
+    }
+
+    public FormAgendarCita(Paciente pacienteIn, Secretaria secre) {
         this.fechaSeleccionada = LocalDate.now();
         this.citaEditar = null;
+        this.secretariaContexto = secre;
         this.pacientePreseleccionado = pacienteIn;
         this.modoSeleccionFecha = true;
         
@@ -237,6 +245,7 @@ public class FormAgendarCita extends JDialog {
         btnCancelar.setFocusPainted(false);
         btnCancelar.addActionListener(e -> dispose());
         panelBotones.add(btnCancelar);
+        
         cargarMedicos();
 
         if (this.pacientePreseleccionado != null) {
@@ -264,7 +273,15 @@ public class FormAgendarCita extends JDialog {
 
     private void cargarMedicos() {
         cbxMedico.removeAllItems();
-        for (Medico m : SistemaGestion.getInstance().getListaMedicos()) {
+        
+        ArrayList<Medico> medicosAMostrar;
+        if (secretariaContexto != null) {
+            medicosAMostrar = secretariaContexto.getMedicosAsignados();
+        } else {
+            medicosAMostrar = SistemaGestion.getInstance().getListaMedicos();
+        }
+        
+        for (Medico m : medicosAMostrar) {
             cbxMedico.addItem(m); 
         }
         cbxMedico.setSelectedIndex(-1);
