@@ -35,7 +35,6 @@ public class PanelAdmin_Reportes extends JPanel {
         JPanel pnlTop5 = crearTarjetaBase("Top 5 Enfermedades");
         add(pnlTop5);
         
-        // Lógica: Obtener datos y llenar la lista
         JList<String> listaEnfermedades = new JList<>();
         listaEnfermedades.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         listaEnfermedades.setFixedCellHeight(35);
@@ -102,7 +101,7 @@ public class PanelAdmin_Reportes extends JPanel {
     }
 
     private void cargarDatosVacunas(DefaultTableModel model) {
-        model.setRowCount(0); // Limpiar tabla
+        model.setRowCount(0);
         
         HashMap<String, Integer> reporte = SistemaGestion.getInstance().getReporteVacunacion();
         

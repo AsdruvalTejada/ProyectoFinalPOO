@@ -1,9 +1,10 @@
 package logico;
 
 import java.time.LocalDateTime;
+import java.io.Serializable;
 
-public class BloqueoAgenda {
-	//
+public class BloqueoAgenda implements Serializable{
+	private static final long serialVersionUID = 1L;
 	private LocalDateTime fechaHoraInicio;
     private LocalDateTime fechaHoraFin;
     private String motivo;

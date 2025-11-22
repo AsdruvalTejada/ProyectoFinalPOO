@@ -34,7 +34,6 @@ public class Login extends JFrame {
     private JPasswordField txtPassword;
 
     private final Color COLOR_SIDEBAR_BG = new Color(10, 186, 181); 
-    private final Color COLOR_TEXT_LIGHT = Color.WHITE;
     private final Color COLOR_BTN_TEXT   = new Color(10, 186, 181);
 
     public static void main(String[] args) {

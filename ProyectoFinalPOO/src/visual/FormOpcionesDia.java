@@ -4,15 +4,13 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import logico.Cita;
-import logico.SistemaGestion;
+import logico.Secretaria;
 
 import java.awt.GridLayout;
 import java.time.LocalDate;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import java.awt.Color;
 import java.awt.Font;
@@ -23,10 +21,12 @@ import java.awt.event.ActionEvent;
 public class FormOpcionesDia extends JDialog {
 
     private JPanel contentPane;
-    private CalendarioSecretaria panelPadre; 
+    private CalendarioSecretaria panelPadre;
+    private Secretaria secretariaLogueada;
 
-    public FormOpcionesDia(LocalDate fechaSeleccionada, boolean tieneCitaPrevia, CalendarioSecretaria padre) {
+    public FormOpcionesDia(LocalDate fechaSeleccionada, boolean tieneCitaPrevia, CalendarioSecretaria padre, Secretaria secre) {
         this.panelPadre = padre;
+        this.secretariaLogueada = secre;
         
         setTitle("Opciones: " + fechaSeleccionada.toString());
         setBounds(100, 100, 300, 250);
@@ -49,10 +49,8 @@ public class FormOpcionesDia extends JDialog {
         btnAgregar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 dispose(); 
-                
-                FormAgendarCita form = new FormAgendarCita(fechaSeleccionada, null);
+                FormAgendarCita form = new FormAgendarCita(fechaSeleccionada, null, secretariaLogueada);
                 form.setVisible(true);
-                
                 panelPadre.refrescarCalendario();
             }
         });
@@ -60,37 +58,16 @@ public class FormOpcionesDia extends JDialog {
 
         if (tieneCitaPrevia) {
             
-            JButton btnBuscar = new JButton("2. Ver Citas del Día");
+            JButton btnBuscar = new JButton("2. Gestionar Citas del Día");
             btnBuscar.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("Citas para el ").append(fechaSeleccionada).append(":\n");
+                    dispose();
                     
-                    for(Cita c : SistemaGestion.getInstance().getListaCitas()) {
-                        if(c.getFechaCitada().toLocalDate().equals(fechaSeleccionada) && !c.getEstado().equalsIgnoreCase("Cancelada")) {
-                            sb.append("- ").append(c.getId()).append(": ").append(c.getNameVisitante())
-                              .append(" (").append(c.getFechaCitada().toLocalTime()).append(")\n");
-                        }
-                    }
-                    JOptionPane.showMessageDialog(null, sb.toString());
+                    FormListarCitasDia formLista = new FormListarCitasDia(fechaSeleccionada, panelPadre);
+                    formLista.setVisible(true);
                 }
             });
             contentPane.add(btnBuscar);
-
-            JButton btnCancelar = new JButton("3. Cancelar Cita");
-            btnCancelar.setBackground(new Color(255, 100, 100));
-            btnCancelar.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    String idACancelar = JOptionPane.showInputDialog("Ingrese el ID de la cita a cancelar (Ej: C-001):");
-                    if(idACancelar != null && !idACancelar.isEmpty()) {
-                        SistemaGestion.getInstance().cancelarCita(idACancelar);
-                        JOptionPane.showMessageDialog(null, "Proceso de cancelación finalizado.");
-                        dispose();
-                        panelPadre.refrescarCalendario();
-                    }
-                }
-            });
-            contentPane.add(btnCancelar);
         }
         
         JButton btnCerrar = new JButton("Cerrar");

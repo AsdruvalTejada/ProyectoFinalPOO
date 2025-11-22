@@ -102,10 +102,9 @@ public class PanelAdmin_Personal extends JPanel {
 		pnlBotones.add(btnAsignar);
 
 		JButton btnEliminar = new JButton("Eliminar");
-		estilizarBoton(btnEliminar, new Color(86, 223, 207));
+		estilizarBoton(btnEliminar, new Color(220, 53, 69));
 		btnEliminar.addActionListener(e -> eliminarPersonal());
 		pnlBotones.add(btnEliminar);
-
 		cargarPersonal();
 	}
 
