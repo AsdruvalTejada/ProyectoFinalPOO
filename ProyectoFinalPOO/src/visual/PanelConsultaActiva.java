@@ -30,12 +30,13 @@ import logico.Vacuna;
 import logico.Paciente;
 import logico.Medico;
 
+@SuppressWarnings("serial")
 public class PanelConsultaActiva extends JDialog {
 
-    private static final long serialVersionUID = 1L;
     private final JPanel contentPanel = new JPanel();
     private Consulta consultaActual;
-    private PrincipalMedico padre;
+    @SuppressWarnings("unused")
+	private PrincipalMedico padre;
 
     private JComboBox<String> cbxDiagnostico;
     private ArrayList<Enfermedad> listaEnfermedades;
@@ -47,7 +48,7 @@ public class PanelConsultaActiva extends JDialog {
     private final Color COLOR_FONDO = new Color(254, 251, 246);
     private final Color COLOR_VERDE = new Color(0, 200, 151);
 
-    public PanelConsultaActiva(Consulta consulta, PrincipalMedico padre) {
+	public PanelConsultaActiva(Consulta consulta, PrincipalMedico padre) {
         this.consultaActual = consulta;
         this.padre = padre;
         
