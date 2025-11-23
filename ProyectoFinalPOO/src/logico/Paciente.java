@@ -102,6 +102,7 @@ public class Paciente extends Persona {
         return aplicadas;
     }	
 
+	@SuppressWarnings("unused")
 	private boolean registroContieneVacuna(Vacuna vacuna) {
 		return this.registroVacunacion.containsKey(vacuna);
 	}
