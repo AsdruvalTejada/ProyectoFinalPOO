@@ -197,4 +197,4 @@ public class GeneradorReportes {
         pie.setAlignment(Element.ALIGN_CENTER);
         doc.add(pie);
     }
-}//
+}
