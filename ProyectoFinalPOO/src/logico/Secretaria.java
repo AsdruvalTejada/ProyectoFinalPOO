@@ -1,10 +1,9 @@
 package logico;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class Secretaria extends Persona {
-
+	private static final long serialVersionUID = 1L;
 	private ArrayList<Medico> medicosAsignados;
 
 	public Secretaria(String id, String name, String apellido, LocalDate fechaNacimiento, String sexo, String contacto) {

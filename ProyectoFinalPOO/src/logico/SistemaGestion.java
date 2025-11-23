@@ -2,13 +2,14 @@ package logico;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.io.*;
 
-public class SistemaGestion {
+public class SistemaGestion implements Serializable{
+	
+	private static final long serialVersionUID = 1L;
 	private ArrayList<Paciente> listaPacientes;
     private ArrayList<Medico> listaMedicos;
     private ArrayList<Cita> listaCitas;
@@ -17,8 +18,8 @@ public class SistemaGestion {
     private ArrayList<Usuario> listaUsuarios;
     private ArrayList<Secretaria> listaSecretarias;
     private static SistemaGestion clinica = null;
-    public static int genIdCita = 0;
-    public static int genIdConsulta = 0;
+    private int genIdCita = 0;
+    private int genIdConsulta = 0;
 
     private SistemaGestion() {
         super();
@@ -110,20 +111,20 @@ public class SistemaGestion {
 		SistemaGestion.clinica = clinica;
 	}
 
-	public static int getGenIdCita() {
+	public int getGenIdCita() {
 		return genIdCita;
 	}
 
-	public static void setGenIdCita(int genIdCita) {
-		SistemaGestion.genIdCita = genIdCita;
+	public void setGenIdCita(int genIdCita) {
+		this.genIdCita = genIdCita;
 	}
 
-	public static int getGenIdConsulta() {
+	public int getGenIdConsulta() {
 		return genIdConsulta;
 	}
 
-	public static void setGenIdConsulta(int genIdConsulta) {
-		SistemaGestion.genIdConsulta = genIdConsulta;
+	public void setGenIdConsulta(int genIdConsulta) {
+		this.genIdConsulta = genIdConsulta;
 	}
 
     public static SistemaGestion getInstance(){
@@ -132,7 +133,56 @@ public class SistemaGestion {
         }
         return clinica;
     }
+    public void guardarDatos() {
+        File archivo = new File("clinica_data.dat");
+        FileOutputStream fileOut;
+        ObjectOutputStream out;
+        
+        try {
+            fileOut = new FileOutputStream(archivo);
+            out = new ObjectOutputStream(fileOut);
 
+            out.writeObject(this);
+            
+            out.close();
+            fileOut.close();
+            
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void cargarDatos() {
+        File archivo = new File("clinica_data.dat");
+
+        if (!archivo.exists()) {
+            System.out.println("No se encontraron datos guardados. Iniciando sistema nuevo.");
+            return;
+        }
+        
+        FileInputStream fileIn;
+        ObjectInputStream in;
+        
+        try {
+            fileIn = new FileInputStream(archivo);
+            in = new ObjectInputStream(fileIn);
+
+            clinica = (SistemaGestion) in.readObject();
+            
+            in.close();
+            fileIn.close();
+            System.out.println("Datos cargados exitosamente.");
+            
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("Error al cargar los datos (IO): " + e.getMessage());
+        } catch (ClassNotFoundException e) {
+            System.out.println("Error: Clase SistemaGestion no encontrada.");
+        }
+    }
 
     public Usuario validarLogin(String username, String password) {
         for (Usuario user : listaUsuarios) {
@@ -150,36 +200,50 @@ public class SistemaGestion {
         listaCitas.add(cita);
     }
     
-    public void registrarPaciente(Paciente pac) { listaPacientes.add(pac); }
-    public void registrarMedico(Medico med) { listaMedicos.add(med); }
-    public void agregarEnfermedadCatalogo(Enfermedad enf) { catalogoEnfermedades.add(enf); }
-    public void agregarVacuna(Vacuna vac) { catalogoVacunas.add(vac); }   
-    public void registrarSecretaria(Secretaria sec) { this.listaSecretarias.add(sec); }
+    public void registrarPaciente(Paciente pac) { 
+    	listaPacientes.add(pac); 
+    }
+    public void registrarMedico(Medico med) { 
+    	listaMedicos.add(med); 
+    }
+    public void agregarEnfermedadCatalogo(Enfermedad enf) { 
+    	catalogoEnfermedades.add(enf); 
+    }
+    public void agregarVacuna(Vacuna vac) {
+    	catalogoVacunas.add(vac); 
+   }   
+    public void registrarSecretaria(Secretaria sec) { 
+    	this.listaSecretarias.add(sec); 
+    }
 
     public Cita buscarCitaPorId(String idCita) {
         for(Cita c : listaCitas) {
-            if(c.getId().equalsIgnoreCase(idCita)) return c;
+            if(c.getId().equalsIgnoreCase(idCita)) 
+            	return c;
         }
         return null;
     }
     
     public Paciente buscarPacientePorId(String idPaciente) {
         for(Paciente p : listaPacientes) {
-            if(p.getId().equalsIgnoreCase(idPaciente)) return p;
+            if(p.getId().equalsIgnoreCase(idPaciente)) 
+            	return p;
         }
         return null;
     }
     
     public Medico buscarMedicoPorId(String idMedico) {
         for(Medico m : listaMedicos) {
-            if(m.getId().equalsIgnoreCase(idMedico)) return m;
+            if(m.getId().equalsIgnoreCase(idMedico)) 
+            	return m;
         }
         return null;
     }
     
     public Secretaria buscarSecretariaPorId(String idSecretaria) {
         for(Secretaria s : listaSecretarias) {
-            if(s.getId().equalsIgnoreCase(idSecretaria)) return s;
+            if(s.getId().equalsIgnoreCase(idSecretaria)) 
+            	return s;
         }
         return null;
     }

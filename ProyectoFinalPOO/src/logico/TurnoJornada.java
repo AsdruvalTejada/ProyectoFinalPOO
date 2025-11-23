@@ -1,8 +1,10 @@
 package logico;
 
 import java.time.LocalTime;
+import java.io.Serializable;
 
-public class TurnoJornada {
+public class TurnoJornada implements Serializable{
+	private static final long serialVersionUID = 1L;
     private String diaSemana;
     private LocalTime horaInicio;
     private LocalTime horaFin;
