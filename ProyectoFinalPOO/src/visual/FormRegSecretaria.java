@@ -226,6 +226,7 @@ public class FormRegSecretaria extends JDialog {
 			secreEdit.setSexo(sexo);
 			secreEdit.setContacto(contacto);
 			secreEdit.setFechaNacimiento(fechaNac);
+			SistemaGestion.getInstance().guardarDatos();
 			JOptionPane.showMessageDialog(this, "Datos actualizados correctamente.");
 		}
 		dispose();

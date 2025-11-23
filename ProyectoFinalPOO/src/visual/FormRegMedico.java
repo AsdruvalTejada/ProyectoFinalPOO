@@ -103,7 +103,6 @@ public class FormRegMedico extends JDialog {
         panelForm.setLayout(null);
         contentPanel.add(panelForm);
 
-        // --- ID GENERADO ---
         crearLabel("ID Médico:", 30, 20, panelForm);
         txtId = new JTextField();
         txtId.setBounds(140, 20, 150, 25);
@@ -312,6 +311,7 @@ public class FormRegMedico extends JDialog {
                 medicoEdicion.setEspecialidad(especialidad);
                 medicoEdicion.setDuracionCitaMinutos(duracion);
                 medicoEdicion.setLimiteCitasPorDia(limite);
+                SistemaGestion.getInstance().guardarDatos();
                 JOptionPane.showMessageDialog(this, "Médico modificado correctamente.");
             }
             dispose();
