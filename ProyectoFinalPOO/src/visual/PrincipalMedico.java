@@ -32,6 +32,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
+import ds.desktop.notify.DesktopNotify;
 
 import logico.Cita;
 import logico.Medico;
@@ -456,10 +457,14 @@ public class PrincipalMedico extends JFrame {
                         String textoAlerta = mensaje.split(":")[1];
                         
                         javax.swing.SwingUtilities.invokeLater(() -> {
-                            JOptionPane.showMessageDialog(PrincipalMedico.this, 
+                            
+                            DesktopNotify.showDesktopMessage(
+                                "Recordatorio de Agenda", 
                                 textoAlerta, 
-                                "⏰ RECORDATORIO DE CITA", 
-                                JOptionPane.INFORMATION_MESSAGE);
+                                DesktopNotify.INFORMATION,
+                                8000L
+                            );                            
+                            java.awt.Toolkit.getDefaultToolkit().beep();
                                 
                             refrescarAgenda(); 
                         });

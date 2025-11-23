@@ -16,8 +16,6 @@ public class ServerCentral {
 
     public static void main(String args[]) {
         try (ServerSocket sfd = new ServerSocket(7000)) {
-            System.out.println("--- SERVIDOR DE ALERTAS MÉDICAS INICIADO (Puerto 7000) ---");
-
             iniciarRelojMonitor();
 
             while (true) {
@@ -34,32 +32,28 @@ public class ServerCentral {
         Thread reloj = new Thread(() -> {
             while (true) {
                 try {
-                    Thread.sleep(10000);
+                    Thread.sleep(1000);
                     
                     LocalTime ahora = LocalTime.now();
                     LocalTime horaEn5Minutos = ahora.plusMinutes(5);
                     String horaBusquedaStr = horaEn5Minutos.format(DateTimeFormatter.ofPattern("HH:mm"));
-                    System.out.println("[DEBUG] Hora Servidor: " + ahora.format(DateTimeFormatter.ofPattern("HH:mm:ss")) 
-                            + " | Buscando citas programadas para las: " + horaBusquedaStr);
 
                     synchronized (listaAlertas) {
                         Iterator<RecordatorioCita> it = listaAlertas.iterator();
                         while (it.hasNext()) {
                             RecordatorioCita recordatorio = it.next();
                             
-                            System.out.println("[DEBUG] Comparando: Objetivo [" + horaBusquedaStr + "] vs Guardada [" + recordatorio.horaCita + "]");
-                            
                             if (recordatorio.horaCita.equals(horaBusquedaStr)) {
                                 
                                 Conexion conexionMedico = medicosConectados.get(recordatorio.idMedico);
                                 
                                 if (conexionMedico != null) {
-                                    String mensaje = "ALERTA: En 5 minutos tiene cita con " + recordatorio.nombrePaciente;
+                                    String mensaje = "RECORDATORIO: En 5 minutos tiene cita con " + recordatorio.nombrePaciente;
                                     conexionMedico.enviarMensaje(mensaje);
-                                    System.out.println(">>> ¡ALERTA ENVIADA AL MÉDICO " + recordatorio.idMedico + "! <<<");
+                                    System.out.println(">>> Alerta enviada al Dr. " + recordatorio.idMedico + " <<<");
                                     it.remove(); 
                                 } else {
-                                    System.out.println("[DEBUG] Hora coincide, pero el médico " + recordatorio.idMedico + " NO está conectado.");
+                                    System.out.println("Aviso: Médico " + recordatorio.idMedico + " no conectado para recibir alerta.");
                                 }
                             }
                         }
