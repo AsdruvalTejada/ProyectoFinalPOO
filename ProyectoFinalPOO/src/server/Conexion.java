@@ -4,48 +4,45 @@ import java.io.*;
 import java.net.*;
 
 public class Conexion extends Thread {
-    Socket socket;
-    DataInputStream entrada;
-    DataOutputStream salida;
-    String idUsuario;
+	Socket socket;
+	DataInputStream entrada;
+	DataOutputStream salida;
+	String idUsuario;
 
-    public Conexion(Socket s) {
-        this.socket = s;
-        try {
-            entrada = new DataInputStream(new BufferedInputStream(s.getInputStream()));
-            salida = new DataOutputStream(new BufferedOutputStream(s.getOutputStream()));
-        } catch (IOException e) { e.printStackTrace(); }
-    }
+	public Conexion(Socket s) {
+		this.socket = s;
+		try {
+			entrada = new DataInputStream(new BufferedInputStream(s.getInputStream()));
+			salida = new DataOutputStream(new BufferedOutputStream(s.getOutputStream()));
+		} catch (IOException e) { e.printStackTrace(); }
+	}
 
-    public void run() {
-        try {
-            while (true) {
-                String mensaje = entrada.readUTF(); // Espera mensaje
-                
-                // CASO A: El Médico se conecta
-                if (mensaje.startsWith("LOGIN:")) { 
-                    idUsuario = mensaje.split(":")[1];
-                    synchronized (ServerCentral.medicosConectados) {
-                        ServerCentral.medicosConectados.put(idUsuario, this);
-                    }
+	public void run() {
+		try {
+			while (true) {
+				String mensaje = entrada.readUTF();
+
+				if (mensaje.startsWith("LOGIN:")) { 
+					idUsuario = mensaje.split(":")[1];
+					ServerCentral.medicosConectados.put(idUsuario, this);
                     System.out.println("Médico conectado: " + idUsuario);
-                } 
-                // CASO B: La Secretaria registra una cita futura
-                else if (mensaje.startsWith("NUEVA_CITA:")) {
-                    // Protocolo: NUEVA_CITA:ID_MEDICO:HORA:PACIENTE
-                    String[] partes = mensaje.split(":");
-                    ServerCentral.agregarAlerta(partes[1], partes[2], partes[3]);
-                }
-            }
-        } catch (IOException e) {
-            if(idUsuario != null) ServerCentral.medicosConectados.remove(idUsuario);
-        }
-    }
+				} 
+				else if (mensaje.startsWith("NUEVA_CITA;")) {
 
-    public void enviarMensaje(String msg) {
-        try {
-            salida.writeUTF(msg);
-            salida.flush();
-        } catch (IOException e) { e.printStackTrace(); }
-    }
+					String[] partes = mensaje.split(";");
+
+					ServerCentral.agregarAlerta(partes[1], partes[2], partes[3]);
+				}
+			}
+		} catch (IOException e) {
+			if(idUsuario != null) ServerCentral.medicosConectados.remove(idUsuario);
+		}
+	}
+
+	public void enviarMensaje(String msg) {
+		try {
+			salida.writeUTF(msg);
+			salida.flush();
+		} catch (IOException e) { e.printStackTrace(); }
+	}
 }

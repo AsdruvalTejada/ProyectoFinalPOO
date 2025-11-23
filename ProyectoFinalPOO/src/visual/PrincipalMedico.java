@@ -442,28 +442,25 @@ public class PrincipalMedico extends JFrame {
     private void listenServer() {
         Thread hiloEscucha = new Thread(() -> {
             try {
-                java.net.Socket s = new java.net.Socket("127.0.0.1", 7000);
+                @SuppressWarnings("resource")
+				java.net.Socket s = new java.net.Socket("127.0.0.1", 7000);
                 java.io.DataOutputStream out = new java.io.DataOutputStream(s.getOutputStream());
                 java.io.DataInputStream in = new java.io.DataInputStream(s.getInputStream());
                 
-                // 1. Identificarse con el ID del Médico actual
                 out.writeUTF("LOGIN:" + medicoActual.getId());
                 
-                // 2. Bucle infinito escuchando al servidor
                 while(true) {
-                    String mensaje = in.readUTF(); // Se queda esperando aquí
+                    String mensaje = in.readUTF();
                     
                     if (mensaje.startsWith("ALERTA:")) {
                         String textoAlerta = mensaje.split(":")[1];
                         
-                        // Actualizar la UI desde el hilo del socket
                         javax.swing.SwingUtilities.invokeLater(() -> {
                             JOptionPane.showMessageDialog(PrincipalMedico.this, 
                                 textoAlerta, 
                                 "⏰ RECORDATORIO DE CITA", 
                                 JOptionPane.INFORMATION_MESSAGE);
                                 
-                            // Opcional: Recargar la tabla automáticamente
                             refrescarAgenda(); 
                         });
                     }
