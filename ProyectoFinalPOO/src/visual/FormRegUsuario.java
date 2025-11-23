@@ -291,7 +291,7 @@ public class FormRegUsuario extends JDialog {
             }
 
             Usuario nuevoUsuario = new Usuario(user, pass, rol, idVinculado);
-            SistemaGestion.getInstance().getListaUsuarios().add(nuevoUsuario);
+            SistemaGestion.getInstance().registrarUsuario(nuevoUsuario);
             JOptionPane.showMessageDialog(this, "Usuario creado exitosamente.");
             
         } else {
@@ -304,6 +304,7 @@ public class FormRegUsuario extends JDialog {
             }
             
             usuarioEdicion.setUsername(user);
+            SistemaGestion.getInstance().guardarDatos();
             JOptionPane.showMessageDialog(this, "Usuario actualizado correctamente.");
         }
         

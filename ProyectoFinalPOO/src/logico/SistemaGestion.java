@@ -221,6 +221,10 @@ public class SistemaGestion implements Serializable{
     	this.listaSecretarias.add(sec);
     	guardarDatos();
     }
+    public void registrarUsuario(Usuario user) {
+        this.listaUsuarios.add(user);
+        guardarDatos(); 
+    }
 
     public Cita buscarCitaPorId(String idCita) {
         for(Cita c : listaCitas) {
