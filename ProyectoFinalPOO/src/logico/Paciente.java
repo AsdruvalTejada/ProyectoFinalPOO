@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Paciente extends Persona {
-    
+	private static final long serialVersionUID = 1L;
     private String tipoSangre;
     private float estatura;
     private ArrayList<Consulta> historialConsultas;

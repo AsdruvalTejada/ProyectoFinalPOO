@@ -434,7 +434,6 @@ public class PrincipalMedico extends JFrame {
             }
         }
     }
-    
     public void refrescarAgenda() {
         cargarCitasDeFechaSeleccionada();
     }

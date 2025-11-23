@@ -133,7 +133,7 @@ public class FormAgendarCita extends JDialog {
         txtCodigo.setBackground(COLOR_BLOQUEADO);
         txtCodigo.setFont(new Font("Segoe UI", Font.BOLD, 12));
         txtCodigo.setBounds(120, 20, 150, 25);
-        txtCodigo.setText("C-" + (SistemaGestion.genIdCita + 1)); 
+        txtCodigo.setText("C-" + (SistemaGestion.getInstance().getGenIdCita() + 1)); 
         panelForm.add(txtCodigo);
 
         JLabel lblCedula = new JLabel("Cédula:");

@@ -9,7 +9,7 @@ import java.time.format.TextStyle;
 import java.util.Locale;
 
 public class Medico extends Persona {
-    
+	private static final long serialVersionUID = 1L;
 	private String especialidad;
     private int limiteCitasPorDia;
     private int duracionCitaMinutos;
