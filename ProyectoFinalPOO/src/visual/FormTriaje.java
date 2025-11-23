@@ -1,30 +1,36 @@
 package visual;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerDateModel;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.JTextArea;
-import javax.swing.JScrollPane;
-import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
-import java.awt.Font;
 import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Date;
 import java.util.Calendar;
-import java.awt.event.ActionEvent;
+import java.util.Date;
+
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SpinnerDateModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.text.MaskFormatter;
 
 import logico.Cita;
 import logico.Consulta;
@@ -49,26 +55,39 @@ public class FormTriaje extends JDialog {
     private JTextField txtApellido;
     private JSpinner dateNacimiento; 
     private JComboBox<String> cbxSexo;
-    private JTextField txtContacto;
+    private JFormattedTextField txtContacto; 
     private JComboBox<String> cbxTipoSangre;
     private JSpinner spnEstatura;
 
-    private final Color COLOR_FONDO = new Color(254, 251, 246);
-    private final Color COLOR_VERDE = new Color(0, 200, 151);
-    private final Color COLOR_BLOQUEADO = new Color(230, 230, 230); 
+    private final Color COLOR_THEME = new Color(0, 190, 165);
+    private final Color COLOR_BG = Color.WHITE;
+    private final Color COLOR_BORDER = new Color(200, 200, 200);
+    private final Color COLOR_TEXTO = new Color(60, 60, 60);
+    private final Color COLOR_BLOQUEADO = new Color(240, 240, 240);
 
     public FormTriaje(String idCita, PrincipalMedico padre) {
         this.idCita = idCita;
         this.padre = padre;
 
-        setTitle("Triaje Inicial - Toma de Signos Vitales");
-        setBounds(100, 100, 500, 600);
+        setTitle("Triaje - Toma de Signos Vitales");
+        setBounds(100, 100, 520, 650);
         setLocationRelativeTo(null);
         setModal(true);
         setResizable(false);
         getContentPane().setLayout(new BorderLayout());
-        contentPanel.setBackground(COLOR_FONDO);
-        contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+        JPanel panelHeader = new JPanel(new BorderLayout());
+        panelHeader.setBackground(COLOR_THEME);
+        panelHeader.setBorder(new EmptyBorder(15, 10, 15, 10));
+        JLabel lblTitulo = new JLabel("TRIAJE INICIAL");
+        lblTitulo.setForeground(Color.WHITE);
+        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblTitulo.setHorizontalAlignment(SwingConstants.CENTER);
+        panelHeader.add(lblTitulo, BorderLayout.CENTER);
+        getContentPane().add(panelHeader, BorderLayout.NORTH);
+
+        contentPanel.setBackground(COLOR_BG);
+        contentPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
         getContentPane().add(contentPanel, BorderLayout.CENTER);
         contentPanel.setLayout(null);
 
@@ -83,121 +102,144 @@ public class FormTriaje extends JDialog {
         esPacienteNuevo = (pacienteExistente == null);
 
         JPanel panelClinico = new JPanel();
-        panelClinico.setBorder(new TitledBorder(null, "Signos Vitales y Motivo", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        panelClinico.setBackground(COLOR_FONDO);
-        panelClinico.setBounds(10, 10, 464, 200);
+        TitledBorder borderClinico = new TitledBorder(new LineBorder(COLOR_THEME, 1, true), "Signos Vitales y Motivo", TitledBorder.LEADING, TitledBorder.TOP, new Font("Segoe UI", Font.BOLD, 12), COLOR_THEME);
+        panelClinico.setBorder(borderClinico);
+        panelClinico.setBackground(COLOR_BG);
+        panelClinico.setBounds(10, 10, 480, 200);
         contentPanel.add(panelClinico);
         panelClinico.setLayout(null);
 
         JLabel lblPeso = new JLabel("Peso (Lb):");
-        lblPeso.setBounds(10, 30, 80, 14);
+        lblPeso.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblPeso.setForeground(COLOR_TEXTO);
+        lblPeso.setBounds(20, 30, 80, 20);
         panelClinico.add(lblPeso);
 
         spnPeso = new JSpinner();
         spnPeso.setModel(new SpinnerNumberModel(150.0, 1.0, 500.0, 1.0));
-        spnPeso.setBounds(80, 27, 70, 20);
+        spnPeso.setBounds(90, 30, 80, 25);
         panelClinico.add(spnPeso);
 
         JLabel lblPresion = new JLabel("Presión:");
-        lblPresion.setBounds(170, 30, 60, 14);
+        lblPresion.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblPresion.setForeground(COLOR_TEXTO);
+        lblPresion.setBounds(220, 30, 60, 20);
         panelClinico.add(lblPresion);
 
         txtPresion = new JTextField();
         txtPresion.setToolTipText("Ej. 120/80");
-        txtPresion.setBounds(230, 27, 80, 20);
+        txtPresion.setBounds(280, 30, 100, 25);
         panelClinico.add(txtPresion);
-        txtPresion.setColumns(10);
 
         JLabel lblSintomas = new JLabel("Síntomas / Motivo:");
-        lblSintomas.setBounds(10, 60, 150, 14);
+        lblSintomas.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        lblSintomas.setForeground(COLOR_TEXTO);
+        lblSintomas.setBounds(20, 70, 200, 20);
         panelClinico.add(lblSintomas);
 
         JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setBounds(10, 80, 444, 100);
+        scrollPane.setBounds(20, 95, 440, 85);
+        scrollPane.setBorder(new LineBorder(COLOR_BORDER));
         panelClinico.add(scrollPane);
 
         txtSintomas = new JTextArea();
+        txtSintomas.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        txtSintomas.setLineWrap(true);
         scrollPane.setViewportView(txtSintomas);
 
         panelDatosPersonales = new JPanel();
-        String tituloPanel = esPacienteNuevo ? "Registro Nuevo Paciente (Llenar)" : "Datos del Paciente (Lectura)";
-        panelDatosPersonales.setBorder(new TitledBorder(null, tituloPanel, TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        panelDatosPersonales.setBackground(COLOR_FONDO);
-        panelDatosPersonales.setBounds(10, 220, 464, 280);
+        String tituloPanel = esPacienteNuevo ? "Registro Nuevo Paciente" : "Datos del Paciente (Lectura)";
+        TitledBorder borderDatos = new TitledBorder(new LineBorder(Color.GRAY, 1, true), tituloPanel, TitledBorder.LEADING, TitledBorder.TOP, new Font("Segoe UI", Font.BOLD, 12), Color.GRAY);
+        panelDatosPersonales.setBorder(borderDatos);
+        panelDatosPersonales.setBackground(COLOR_BG);
+        panelDatosPersonales.setBounds(10, 230, 480, 280);
         contentPanel.add(panelDatosPersonales);
         panelDatosPersonales.setLayout(null);
 
         JLabel lblNombre = new JLabel("Nombre:");
-        lblNombre.setBounds(10, 25, 60, 14);
+        lblNombre.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblNombre.setBounds(20, 30, 60, 20);
         panelDatosPersonales.add(lblNombre);
         
         txtNombre = new JTextField();
-        txtNombre.setBounds(80, 22, 150, 20);
+        txtNombre.setBounds(80, 30, 150, 25);
         panelDatosPersonales.add(txtNombre);
         
         JLabel lblApellido = new JLabel("Apellido:");
-        lblApellido.setBounds(240, 25, 60, 14);
+        lblApellido.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblApellido.setBounds(250, 30, 60, 20);
         panelDatosPersonales.add(lblApellido);
         
         txtApellido = new JTextField();
-        txtApellido.setBounds(300, 22, 150, 20);
+        txtApellido.setBounds(310, 30, 150, 25);
         panelDatosPersonales.add(txtApellido);
         
         JLabel lblNacimiento = new JLabel("F. Nacim:");
-        lblNacimiento.setBounds(10, 55, 60, 14);
+        lblNacimiento.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblNacimiento.setBounds(20, 70, 60, 20);
         panelDatosPersonales.add(lblNacimiento);
 
         SpinnerDateModel dateModel = new SpinnerDateModel();
         dateNacimiento = new JSpinner(dateModel);
         JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(dateNacimiento, "dd/MM/yyyy");
         dateNacimiento.setEditor(dateEditor);
-        dateNacimiento.setBounds(80, 52, 100, 20);
+        dateNacimiento.setBounds(80, 70, 110, 25);
         panelDatosPersonales.add(dateNacimiento);
         
         JLabel lblSexo = new JLabel("Sexo:");
-        lblSexo.setBounds(200, 55, 46, 14);
+        lblSexo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblSexo.setBounds(200, 70, 40, 20);
         panelDatosPersonales.add(lblSexo);
         
         cbxSexo = new JComboBox<>();
         cbxSexo.setModel(new DefaultComboBoxModel<>(new String[] {"M", "F"}));
-        cbxSexo.setBounds(240, 52, 50, 22);
+        cbxSexo.setBackground(Color.WHITE);
+        cbxSexo.setBounds(240, 70, 50, 25);
         panelDatosPersonales.add(cbxSexo);
         
         JLabel lblSangre = new JLabel("Sangre:");
-        lblSangre.setBounds(310, 55, 50, 14);
+        lblSangre.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblSangre.setBounds(310, 70, 50, 20);
         panelDatosPersonales.add(lblSangre);
         
-        cbxTipoSangre = new JComboBox<>();
-        cbxTipoSangre.setModel(new DefaultComboBoxModel<>(new String[] {"A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"}));
-        cbxTipoSangre.setBounds(360, 52, 50, 22);
+        cbxTipoSangre = new JComboBox<>(new String[] {"A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"});
+        cbxTipoSangre.setBackground(Color.WHITE);
+        cbxTipoSangre.setBounds(360, 70, 60, 25);
         panelDatosPersonales.add(cbxTipoSangre);
         
         JLabel lblEstatura = new JLabel("Estatura (m):");
-        lblEstatura.setBounds(10, 90, 80, 14);
+        lblEstatura.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblEstatura.setBounds(20, 110, 80, 20);
         panelDatosPersonales.add(lblEstatura);
         
         spnEstatura = new JSpinner();
         spnEstatura.setModel(new SpinnerNumberModel(1.70, 0.50, 2.50, 0.01));
-        spnEstatura.setBounds(90, 87, 60, 20);
+        spnEstatura.setBounds(100, 110, 60, 25);
         panelDatosPersonales.add(spnEstatura);
         
         JLabel lblContacto = new JLabel("Contacto:");
-        lblContacto.setBounds(170, 90, 60, 14);
+        lblContacto.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblContacto.setBounds(180, 110, 60, 20);
         panelDatosPersonales.add(lblContacto);
         
-        txtContacto = new JTextField();
-        txtContacto.setBounds(230, 87, 180, 20);
+        try {
+            MaskFormatter mascaraTel = new MaskFormatter("###-###-####");
+            mascaraTel.setPlaceholderCharacter('_');
+            txtContacto = new JFormattedTextField(mascaraTel);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            txtContacto = new JFormattedTextField(); 
+        }
+        txtContacto.setBounds(240, 110, 220, 25);
         panelDatosPersonales.add(txtContacto);
 
         if (esPacienteNuevo) {
-            // CASO 1: PACIENTE NUEVO -> Recuperar datos de la Cita y Separar Nombre
             Calendar cal = Calendar.getInstance();
             cal.set(2000, Calendar.JANUARY, 1);
             dateNacimiento.setValue(cal.getTime());
             
             String nombreCompleto = cita.getNameVisitante();
             if(nombreCompleto != null && !nombreCompleto.isEmpty()) {
-                // Lógica simple para separar nombre y apellido
                 int ultimoEspacio = nombreCompleto.lastIndexOf(" ");
                 if (ultimoEspacio != -1) {
                     txtNombre.setText(nombreCompleto.substring(0, ultimoEspacio));
@@ -207,11 +249,9 @@ public class FormTriaje extends JDialog {
                     txtApellido.setText("");
                 }
             }
-            txtContacto.setText("");
-            // Los campos permanecen editables para correcciones
+            txtContacto.setValue(null); 
             
         } else {
-            // CASO 2: PACIENTE EXISTENTE -> BLOQUEAR TODO
             txtNombre.setText(pacienteExistente.getName());
             txtNombre.setEditable(false);
             txtNombre.setBackground(COLOR_BLOQUEADO);
@@ -243,13 +283,16 @@ public class FormTriaje extends JDialog {
 
         JPanel buttonPane = new JPanel();
         buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-        buttonPane.setBackground(COLOR_FONDO);
+        buttonPane.setBackground(COLOR_BG);
+        buttonPane.setBorder(new EmptyBorder(10, 10, 10, 10));
         getContentPane().add(buttonPane, BorderLayout.SOUTH);
         
         JButton okButton = new JButton("INICIAR CONSULTA");
-        okButton.setBackground(COLOR_VERDE);
+        okButton.setBackground(COLOR_THEME);
         okButton.setForeground(Color.WHITE);
         okButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        okButton.setFocusPainted(false);
+        okButton.setBorderPainted(false);
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 procesarInicioConsulta();
@@ -258,7 +301,12 @@ public class FormTriaje extends JDialog {
         buttonPane.add(okButton);
         getRootPane().setDefaultButton(okButton);
         
-        JButton cancelButton = new JButton("Cancelar");
+        JButton cancelButton = new JButton("CANCELAR");
+        cancelButton.setBackground(new Color(240, 240, 240));
+        cancelButton.setForeground(COLOR_TEXTO);
+        cancelButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        cancelButton.setFocusPainted(false);
+        cancelButton.setBorderPainted(false);
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 dispose();
@@ -268,12 +316,12 @@ public class FormTriaje extends JDialog {
     }
     
     private void procesarInicioConsulta() {
-        String sintomas = txtSintomas.getText();
+        String sintomas = txtSintomas.getText().trim();
         float peso = Float.parseFloat(spnPeso.getValue().toString());
-        String presion = txtPresion.getText();
+        String presion = txtPresion.getText().trim();
         
         if (sintomas.isEmpty() || presion.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Por favor complete Síntomas y Presión Arterial.", "Datos Faltantes", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Por favor complete los campos de Síntomas y Presión Arterial.", "Faltan Datos Clínicos", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -286,12 +334,18 @@ public class FormTriaje extends JDialog {
         float estatura = 0;
         
         if (esPacienteNuevo) {
-            if (txtNombre.getText().isEmpty() || txtApellido.getText().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Verifique Nombre y Apellido del paciente.", "Error", JOptionPane.WARNING_MESSAGE);
+            String contactoRaw = txtContacto.getText();
+            boolean contactoVacio = contactoRaw.replace("-", "").replace("_", "").trim().isEmpty();
+            String nombreRaw = txtNombre.getText().trim();
+            String apellidoRaw = txtApellido.getText().trim();
+
+            if (nombreRaw.isEmpty() || apellidoRaw.isEmpty() || contactoVacio) {
+                JOptionPane.showMessageDialog(this, "Para pacientes nuevos, es OBLIGATORIO completar:\n- Nombre\n- Apellido\n- Número de Contacto", "Datos Personales Incompletos", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            nombreFinal = txtNombre.getText();
-            apellidoFinal = txtApellido.getText();
+            
+            nombreFinal = nombreRaw;
+            apellidoFinal = apellidoRaw;
 
             Date dateValue = (Date) dateNacimiento.getValue();
             nacimiento = dateValue.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
@@ -302,7 +356,6 @@ public class FormTriaje extends JDialog {
             
             Cita citaObj = SistemaGestion.getInstance().buscarCitaPorId(idCita);
             if(citaObj != null) {
-                // Actualizamos el nombre concatenado en la cita por si el médico lo corrigió
                 citaObj.setNameVisitante(nombreFinal + " " + apellidoFinal); 
             }
         } else {
