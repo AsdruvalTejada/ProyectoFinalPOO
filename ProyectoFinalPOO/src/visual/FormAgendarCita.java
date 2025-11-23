@@ -25,7 +25,6 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerDateModel;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
@@ -146,12 +145,6 @@ public class FormAgendarCita extends JDialog {
             mascaraCedula.setPlaceholderCharacter('_');
             txtCedula = new JFormattedTextField(mascaraCedula);
             
-            // Lógica para mover el foco automáticamente al terminar de escribir la cédula
-            // Se puede usar un CaretListener o FocusListener, aquí una implementación simple
-            // que solicita foco en 'txtNombre' si el campo se llena.
-            // Nota: Para JFormattedTextField con máscara, es más seguro dejar que el usuario presione TAB
-            // o usar un DocumentListener complejo.
-            // Sin embargo, para asegurar que el cursor INICIAL no esté en el código, hacemos esto:
             
         } catch (ParseException e) {
             txtCedula = new JFormattedTextField(); 
@@ -268,14 +261,11 @@ public class FormAgendarCita extends JDialog {
         
         cargarMedicos();
 
-        // Lógica de foco inicial
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowOpened(java.awt.event.WindowEvent e) {
                 if (pacientePreseleccionado == null) {
-                    // Si no hay paciente, foco en Cédula
                     txtCedula.requestFocus();
                 } else {
-                    // Si ya hay paciente, foco en Médico
                     cbxMedico.requestFocus();
                 }
             }
@@ -385,7 +375,7 @@ public class FormAgendarCita extends JDialog {
                  java.io.DataOutputStream out = new java.io.DataOutputStream(s.getOutputStream())) {
                 
                 String horaCorta = hora.length() > 5 ? hora.substring(0, 5) : hora; 
-                out.writeUTF("NUEVA_CITA:" + idMedico + ":" + horaCorta + ":" + paciente);
+                out.writeUTF("NUEVA_CITA;" + idMedico + ";" + horaCorta + ";" + paciente);
                 
             } catch (Exception e) {
                 System.out.println("Servidor de alertas no disponible (No afecta el guardado local).");

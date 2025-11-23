@@ -53,7 +53,8 @@ public class PanelConsultaActiva extends JDialog {
     private final Color COLOR_TEXTO_HEADER = new Color(0, 150, 136); 
     private final Color COLOR_TEXTO = new Color(60, 60, 60);
 
-    public PanelConsultaActiva(Consulta consulta, PrincipalMedico padre) {
+    @SuppressWarnings("serial")
+	public PanelConsultaActiva(Consulta consulta, PrincipalMedico padre) {
         this.consultaActual = consulta;
         this.padre = padre;
         
