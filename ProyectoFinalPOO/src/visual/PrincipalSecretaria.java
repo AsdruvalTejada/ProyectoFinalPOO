@@ -13,7 +13,8 @@ import logico.Usuario;
 public class PrincipalSecretaria extends JFrame {
 
     private JPanel contentPane;
-    private Usuario userLogueado;
+    @SuppressWarnings("unused")
+	private Usuario userLogueado;
     private Secretaria secretariaLogueada;
 
     public PrincipalSecretaria(Usuario user) {

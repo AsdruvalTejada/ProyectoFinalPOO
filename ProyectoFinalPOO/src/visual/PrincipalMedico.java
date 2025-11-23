@@ -68,7 +68,7 @@ public class PrincipalMedico extends JFrame {
     public PrincipalMedico(Usuario user) {
         this.medicoActual = SistemaGestion.getInstance().getMedicoLogueado(user);
 
-        setTitle("Panel MÈdico - Dr. " + (medicoActual != null ? medicoActual.getApellido() : "N/A"));
+        setTitle("Panel M√©dico - Dr. " + (medicoActual != null ? medicoActual.getApellido() : "N/A"));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 1200, 750); 
         setLocationRelativeTo(null);
@@ -80,7 +80,7 @@ public class PrincipalMedico extends JFrame {
         setContentPane(contentPane);
         
         if (medicoActual == null) {
-            JOptionPane.showMessageDialog(this, "Error: Usuario no vinculado a un MÈdico.", "Error de Acceso", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error: Usuario no vinculado a un M√©dico.", "Error de Acceso", JOptionPane.ERROR_MESSAGE);
             return; 
         }
 
@@ -170,12 +170,12 @@ public class PrincipalMedico extends JFrame {
         
         panelBotonesIzq.add(pnlGestionBtns, BorderLayout.CENTER);
         
-        JButton btnCerrarSesion = new JButton("CERRAR SESI”N");
+        JButton btnCerrarSesion = new JButton("CERRAR SESI√ìN");
         estilizarBoton(btnCerrarSesion, COLOR_ROJO_SALIR);
         btnCerrarSesion.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int confirm = JOptionPane.showConfirmDialog(PrincipalMedico.this, 
-                        "øSeguro que desea salir?", "Cerrar SesiÛn", JOptionPane.YES_NO_OPTION);
+                        "¬øSeguro que desea salir?", "Cerrar Sesi√≥n", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
                     dispose();
                     Login login = new Login();
@@ -260,7 +260,7 @@ public class PrincipalMedico extends JFrame {
         btnIniciarConsulta.addActionListener(e -> abrirTriaje());
         panelCardDetalle.add(btnIniciarConsulta);
         
-        btnVerHistorial = new JButton("Ver Historial ClÌnico");
+        btnVerHistorial = new JButton("Ver Historial Cl√≠nico");
         btnVerHistorial.setBackground(COLOR_BLANCO);
         btnVerHistorial.setForeground(COLOR_AZUL_INFO);
         btnVerHistorial.setFont(new Font("Segoe UI", Font.BOLD, 14));
@@ -290,6 +290,7 @@ public class PrincipalMedico extends JFrame {
         cargarCitasDeFechaSeleccionada();
         
         verificarCitasFuturas();
+        listenServer();
     }
     
     private void verificarCitasFuturas() {
@@ -437,5 +438,41 @@ public class PrincipalMedico extends JFrame {
     
     public void refrescarAgenda() {
         cargarCitasDeFechaSeleccionada();
+    }
+    
+    private void listenServer() {
+        Thread hiloEscucha = new Thread(() -> {
+            try {
+                java.net.Socket s = new java.net.Socket("127.0.0.1", 7000);
+                java.io.DataOutputStream out = new java.io.DataOutputStream(s.getOutputStream());
+                java.io.DataInputStream in = new java.io.DataInputStream(s.getInputStream());
+                
+                // 1. Identificarse con el ID del M√©dico actual
+                out.writeUTF("LOGIN:" + medicoActual.getId());
+                
+                // 2. Bucle infinito escuchando al servidor
+                while(true) {
+                    String mensaje = in.readUTF(); // Se queda esperando aqu√≠
+                    
+                    if (mensaje.startsWith("ALERTA:")) {
+                        String textoAlerta = mensaje.split(":")[1];
+                        
+                        // Actualizar la UI desde el hilo del socket
+                        javax.swing.SwingUtilities.invokeLater(() -> {
+                            JOptionPane.showMessageDialog(PrincipalMedico.this, 
+                                textoAlerta, 
+                                "‚è∞ RECORDATORIO DE CITA", 
+                                JOptionPane.INFORMATION_MESSAGE);
+                                
+                            // Opcional: Recargar la tabla autom√°ticamente
+                            refrescarAgenda(); 
+                        });
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("No se pudo conectar al servidor de alertas.");
+            }
+        });
+        hiloEscucha.start();
     }
 }

@@ -367,6 +367,9 @@ public class FormAgendarCita extends JDialog {
             LocalDateTime fechaHoraCita = LocalDateTime.of(fechaSeleccionada, hora);
             
             SistemaGestion.getInstance().crearCita(cedula, nombreCompleto, medico.getId(), fechaHoraCita);
+            if (fechaSeleccionada.equals(LocalDate.now())) {
+            	sendtoServer(medico.getId(), hora.toString(), nombreCompleto);
+            }
             
             JOptionPane.showMessageDialog(this, "¡Cita agendada con éxito!", "Confirmación", JOptionPane.INFORMATION_MESSAGE);
             dispose();
@@ -374,5 +377,19 @@ public class FormAgendarCita extends JDialog {
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error al guardar: " + ex.getMessage());
         }
+    }
+    
+    private void sendtoServer(String idMedico, String hora, String paciente) {
+        new Thread(() -> { 
+            try (java.net.Socket s = new java.net.Socket("127.0.0.1", 7000);
+                 java.io.DataOutputStream out = new java.io.DataOutputStream(s.getOutputStream())) {
+                
+                String horaCorta = hora.length() > 5 ? hora.substring(0, 5) : hora; 
+                out.writeUTF("NUEVA_CITA:" + idMedico + ":" + horaCorta + ":" + paciente);
+                
+            } catch (Exception e) {
+                System.out.println("Servidor de alertas no disponible (No afecta el guardado local).");
+            }
+        }).start();
     }
 }
