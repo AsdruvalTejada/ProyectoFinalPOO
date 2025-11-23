@@ -198,22 +198,28 @@ public class SistemaGestion implements Serializable{
     public void agregarCita(Cita cita) {
         genIdCita++;
         listaCitas.add(cita);
+        guardarDatos();
     }
     
     public void registrarPaciente(Paciente pac) { 
     	listaPacientes.add(pac); 
+    	guardarDatos();
     }
     public void registrarMedico(Medico med) { 
     	listaMedicos.add(med); 
+    	guardarDatos();
     }
     public void agregarEnfermedadCatalogo(Enfermedad enf) { 
     	catalogoEnfermedades.add(enf); 
+    	guardarDatos();
     }
     public void agregarVacuna(Vacuna vac) {
     	catalogoVacunas.add(vac); 
+    	guardarDatos();
    }   
     public void registrarSecretaria(Secretaria sec) { 
-    	this.listaSecretarias.add(sec); 
+    	this.listaSecretarias.add(sec);
+    	guardarDatos();
     }
 
     public Cita buscarCitaPorId(String idCita) {
@@ -278,6 +284,7 @@ public class SistemaGestion implements Serializable{
         if(citaAux != null && citaAux.citaPuedeCancelarse()) {
             citaAux.setEstado("cancelada");
             citaAux.getMedico().liberarAgenda(citaAux);     
+            guardarDatos();
         }
     }
 
@@ -298,11 +305,34 @@ public class SistemaGestion implements Serializable{
     public void crearUsuarioMedico(Medico med, String username, String password) {
         Usuario nuevoUsuario = new Usuario(username, password, "MEDICO", med.getId());
         this.listaUsuarios.add(nuevoUsuario);
+        guardarDatos();
     }
     
     public void crearUsuarioSecretaria(Secretaria sec, String username, String password) {
         Usuario nuevoUsuario = new Usuario(username, password, "SECRETARIA", sec.getId());
         this.listaUsuarios.add(nuevoUsuario);
+        guardarDatos();
+    }
+    public boolean modificarCita(String idCita, LocalDateTime nuevaFecha, Medico nuevoMedico) {
+        Cita cita = buscarCitaPorId(idCita);
+        boolean realizado = false;
+
+        if (cita != null) {
+            if (cita.citaPuedeCancelarse()) {
+                if (nuevoMedico.estaDisponible(nuevaFecha)) {
+
+                    cita.getMedico().liberarAgenda(cita);
+                    cita.setFechaCitada(nuevaFecha);
+                    cita.setMedico(nuevoMedico);
+
+                    nuevoMedico.agregarEnAgenda(cita);
+
+                    realizado = true;
+                    guardarDatos();
+                }
+            }
+        }
+        return realizado;
     }
 
     public Consulta iniciarConsulta(String idCita, String apellido, LocalDate fechaNacimiento, 
@@ -328,6 +358,7 @@ public class SistemaGestion implements Serializable{
             
             citaAux.setEstado("activa");
             pac.agregarConsulta(conAux);
+            guardarDatos();
         }
         return conAux;
     }
@@ -344,6 +375,7 @@ public class SistemaGestion implements Serializable{
                 consulta.getPaciente().marcarVacunaAplicada(vacuna);
             }
             finalizado = true;
+            guardarDatos();
         }
         return finalizado;
     }
