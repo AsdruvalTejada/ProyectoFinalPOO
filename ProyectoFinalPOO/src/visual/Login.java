@@ -40,6 +40,7 @@ public class Login extends JFrame {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
+                	SistemaGestion.cargarDatos();
                     Login frame = new Login();
                     frame.setVisible(true);
                 } catch (Exception e) {
