@@ -426,7 +426,7 @@ public class SistemaGestion implements Serializable{
         }
         return reporte;
     }
-    
+   
     public boolean respaldoRemoto() {
         String ipServidorBackup = "127.0.0.1";
         int puerto = 8000;
@@ -436,7 +436,6 @@ public class SistemaGestion implements Serializable{
     
             out.writeObject(this);
             return true;
-            
         } catch (Exception e) {
             e.printStackTrace();
             return false;
