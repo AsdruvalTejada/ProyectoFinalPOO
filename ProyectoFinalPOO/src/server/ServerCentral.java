@@ -50,10 +50,8 @@ public class ServerCentral {
                                 if (conexionMedico != null) {
                                     String mensaje = "RECORDATORIO: En 5 minutos tiene cita con " + recordatorio.nombrePaciente;
                                     conexionMedico.enviarMensaje(mensaje);
-                                    System.out.println(">>> Alerta enviada al Dr. " + recordatorio.idMedico + " <<<");
+                                    System.out.println("Alerta enviada al Dr. " + recordatorio.idMedico);
                                     it.remove(); 
-                                } else {
-                                    System.out.println("Aviso: Médico " + recordatorio.idMedico + " no conectado para recibir alerta.");
                                 }
                             }
                         }

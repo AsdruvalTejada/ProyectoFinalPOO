@@ -16,6 +16,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import logico.SistemaGestion;
 import logico.Usuario; 
 
 @SuppressWarnings("serial")
@@ -98,6 +100,22 @@ public class PrincipalAdmin extends JFrame {
         btnCatalogos.addActionListener(e -> cardLayout.show(pnlMainContent, "catalogos"));
         
         cardLayout.show(pnlMainContent, "pacientes");
+        
+        JButton btnBackup = createSidebarButton("Respaldo Cloud");
+        btnBackup.addActionListener(e -> {
+            new Thread(() -> {
+                boolean exito = SistemaGestion.getInstance().respaldoRemoto();
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    if (exito) {
+                        JOptionPane.showMessageDialog(this, "Copia de seguridad enviada correctamente.");
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Error al conectar con el servidor de respaldo.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                });
+            }).start();
+        });
+        pnlSidebar.add(btnBackup);
+        
     }
     
     private void cerrarSesion() {
@@ -129,4 +147,5 @@ public class PrincipalAdmin extends JFrame {
         });
         return button;
     }
+    
 }
