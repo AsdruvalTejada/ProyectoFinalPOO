@@ -426,4 +426,20 @@ public class SistemaGestion implements Serializable{
         }
         return reporte;
     }
+    
+    public boolean respaldoRemoto() {
+        String ipServidorBackup = "127.0.0.1";
+        int puerto = 8000;
+        
+        try (java.net.Socket socket = new java.net.Socket(ipServidorBackup, puerto);
+             java.io.ObjectOutputStream out = new java.io.ObjectOutputStream(socket.getOutputStream())) {
+    
+            out.writeObject(this);
+            return true;
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
