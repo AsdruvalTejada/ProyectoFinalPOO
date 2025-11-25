@@ -178,6 +178,12 @@ public class Medico extends Persona {
         return listaHistorial;
     }
     
+    public void addTurnoJornada(String dia, java.time.LocalTime inicio, java.time.LocalTime fin) {
+        TurnoJornada turno = new TurnoJornada(dia, inicio, fin, false);
+        this.horarioFijo.add(turno);
+    }
+
+    
     @Override
     public String toString() {
         return this.name + " " + this.apellido + " (" + this.especialidad + ")";
