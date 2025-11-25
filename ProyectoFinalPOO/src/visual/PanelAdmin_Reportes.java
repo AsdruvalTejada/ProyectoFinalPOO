@@ -66,6 +66,6 @@ public class PanelAdmin_Reportes extends JPanel {
                 dialog.setVisible(true);
             }
         });
-        pnlVacunas.add(btnVerVacunas);
+        pnlVacunas.add(btnVerVacunas);//
     }
 }

@@ -357,5 +357,5 @@ public class DialogVerReporte extends JDialog {
                 colorIndex++;
             }
         }
-    }
+    }//
 }
