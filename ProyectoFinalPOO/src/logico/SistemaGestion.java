@@ -408,21 +408,41 @@ public class SistemaGestion implements Serializable{
         return reporteFinal;
     }
 
+    public HashMap<Enfermedad, Integer> getReporteEnfermedades(){
+        HashMap<Enfermedad, Integer> contEnfermedades = new HashMap<>();
+
+        for(Paciente paciente: listaPacientes) {
+            for(Consulta consulta: paciente.getHistorialConsultas()) {
+                Enfermedad diagnostico = consulta.getDiagnostico();
+                if(diagnostico != null) {
+                    int cont = contEnfermedades.getOrDefault(diagnostico, 0);
+                    contEnfermedades.put(diagnostico, cont+1);
+                }
+            }
+        }
+        return contEnfermedades;
+    }
+
     public HashMap<String, Integer> getReporteVacunacion() {
         HashMap<String, Integer> reporte = new HashMap<>();
+
         for (Vacuna vacCatalogo : this.catalogoVacunas) {
             int cantAplicadas = 0;
             int cantPendientes = 0;
+            String nombreVacuna = vacCatalogo.getNombre();
+
             for (Paciente paciente : this.listaPacientes) {
+                // Usamos getOrDefault por seguridad
                 Boolean estaAplicada = paciente.getRegistroVacunacion().get(vacCatalogo);
+                
                 if (estaAplicada != null && estaAplicada) {
                     cantAplicadas++;
                 } else {
                     cantPendientes++;
                 }
             }
-            reporte.put(vacCatalogo.getNombre() + " - Aplicadas", cantAplicadas);
-            reporte.put(vacCatalogo.getNombre() + " - Pendientes", cantPendientes);
+            reporte.put(nombreVacuna + " (Aplicadas)", cantAplicadas);
+            reporte.put(nombreVacuna + " (Pendientes)", cantPendientes);
         }
         return reporte;
     }
