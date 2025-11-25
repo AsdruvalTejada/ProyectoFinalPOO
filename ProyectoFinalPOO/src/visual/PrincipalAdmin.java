@@ -74,6 +74,21 @@ public class PrincipalAdmin extends JFrame {
         pnlSidebar.add(new JLabel("")); 
         pnlSidebar.add(new JLabel("")); 
         
+        JButton btnBackup = createSidebarButton("Crear Backup");
+        pnlSidebar.add(btnBackup);
+        btnBackup.addActionListener(e -> {
+            new Thread(() -> {
+                boolean exito = SistemaGestion.getInstance().respaldoRemoto();
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    if (exito) {
+                        JOptionPane.showMessageDialog(this, "Copia de seguridad enviada correctamente.");
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Error al conectar con el servidor de respaldo.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                });
+            }).start();
+        });
+
         JButton btnLogout = createSidebarButton("Cerrar Sesión");
         btnLogout.addActionListener(e -> cerrarSesion());
         pnlSidebar.add(btnLogout);
@@ -100,21 +115,6 @@ public class PrincipalAdmin extends JFrame {
         btnCatalogos.addActionListener(e -> cardLayout.show(pnlMainContent, "catalogos"));
         
         cardLayout.show(pnlMainContent, "pacientes");
-        
-        JButton btnBackup = createSidebarButton("Respaldo Cloud");
-        btnBackup.addActionListener(e -> {
-            new Thread(() -> {
-                boolean exito = SistemaGestion.getInstance().respaldoRemoto();
-                javax.swing.SwingUtilities.invokeLater(() -> {
-                    if (exito) {
-                        JOptionPane.showMessageDialog(this, "Copia de seguridad enviada correctamente.");
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Error al conectar con el servidor de respaldo.", "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                });
-            }).start();
-        });
-        pnlSidebar.add(btnBackup);
         
     }
     
