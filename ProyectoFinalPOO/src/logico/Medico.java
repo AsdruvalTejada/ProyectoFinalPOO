@@ -100,43 +100,64 @@ public class Medico extends Persona {
         this.agenda.remove(ag);
     }
     
-    public ArrayList<LocalTime> getSlotsDisponibles(LocalDate fecha) {
-        ArrayList<LocalTime> slots = new ArrayList<>();
+    public ArrayList<LocalTime> getSlotsDisponibles(LocalDate dia) {
+        ArrayList<LocalTime> slotsDisponibles = new ArrayList<>();
+        String diaIngles = dia.getDayOfWeek().name();
+
+        String diaEspanol = "";
         
-        String nombreDiaHoy = obtenerNombreDia(fecha.getDayOfWeek());
-        
-        TurnoJornada turnoHoy = null;
-        for(TurnoJornada t : horarioFijo) {
-            if(t.getDiaSemana().equalsIgnoreCase(nombreDiaHoy)) {
-                turnoHoy = t;
-                break;
-            }
-        }
-        
-        if(turnoHoy == null || !turnoHoy.isActivo()) {
-            return slots; 
-        }
-        
-        int citasHoy = 0;
-        for(Cita c : agenda) {
-            if(c.getFechaCitada().toLocalDate().equals(fecha) && !c.getEstado().equalsIgnoreCase("Cancelada")) {
-                citasHoy++;
-            }
-        }
-        if(citasHoy >= limiteCitasPorDia) {
-            return slots; 
+        switch (diaIngles) {
+            case "MONDAY":    
+            	diaEspanol = "LUNES"; 
+            	break;
+            case "TUESDAY":   
+            	diaEspanol = "MARTES"; 
+            	break;
+            case "WEDNESDAY": 
+            	diaEspanol = "MIERCOLES"; 
+            	break;
+            case "THURSDAY":  
+            	diaEspanol = "JUEVES"; 
+            	break;
+            case "FRIDAY":    
+            	diaEspanol = "VIERNES"; 
+            	break;
+            case "SATURDAY":  
+            	diaEspanol = "SABADO"; 
+            	break;
+            case "SUNDAY":    
+            	diaEspanol = "DOMINGO"; 
+            	break;
         }
 
-        LocalTime cursor = turnoHoy.getHoraInicio();
-        while(cursor.plusMinutes(duracionCitaMinutos).isBefore(turnoHoy.getHoraFin()) || cursor.plusMinutes(duracionCitaMinutos).equals(turnoHoy.getHoraFin())) {
-            LocalDateTime fechaHoraSlot = LocalDateTime.of(fecha, cursor);
-            if(estaDisponible(fechaHoraSlot)) {
-                slots.add(cursor);
+        TurnoJornada turnoDelDia = null;
+        
+        for (TurnoJornada t : this.horarioFijo) {
+            if (turnoDelDia == null) {
+                String diaGuardado = t.getDiaSemana().toUpperCase().replace("É", "E").replace("Á", "A");
+                
+                if (diaGuardado.equalsIgnoreCase(diaEspanol)) {
+                    turnoDelDia = t;
+                }
             }
-            cursor = cursor.plusMinutes(duracionCitaMinutos);
+        }
+
+        if (turnoDelDia == null) {
+            return slotsDisponibles; 
+        }
+
+        LocalTime horaActual = turnoDelDia.getHoraInicio();
+        int duracionReal = (this.duracionCitaMinutos > 0) ? this.duracionCitaMinutos : 30; 
+        
+        while (!horaActual.plusMinutes(duracionReal).isAfter(turnoDelDia.getHoraFin())) {
+            LocalDateTime fechaHoraPrueba = LocalDateTime.of(dia, horaActual);
+            if (this.estaDisponible(fechaHoraPrueba)) {
+                slotsDisponibles.add(horaActual);
+            }
+            horaActual = horaActual.plusMinutes(duracionReal);
         }
         
-        return slots;
+        return slotsDisponibles;
     }
 
     public boolean estaDisponible(LocalDateTime fechaHora) {
@@ -155,12 +176,6 @@ public class Medico extends Persona {
             }
         }
         return true; 
-    }
-    
-    private String obtenerNombreDia(DayOfWeek day) {
-        String d = day.getDisplayName(TextStyle.FULL, new Locale("es", "ES")).toUpperCase();
-        d = d.replace("É", "E").replace("Á", "A");
-        return d;
     }
     
     public void agregarBloqueo(BloqueoAgenda bloqueo) {
