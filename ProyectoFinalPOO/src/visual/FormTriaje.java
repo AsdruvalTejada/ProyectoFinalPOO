@@ -126,8 +126,15 @@ public class FormTriaje extends JDialog {
         lblPresion.setBounds(220, 30, 60, 20);
         panelClinico.add(lblPresion);
 
-        txtPresion = new JTextField();
-        txtPresion.setToolTipText("Ej. 120/80");
+        try {
+            MaskFormatter maskPresion = new MaskFormatter("###/##");
+            maskPresion.setPlaceholderCharacter('_');
+            txtPresion = new JFormattedTextField(maskPresion);
+            txtPresion.setToolTipText("Ejemplo: 120/080");
+        } catch (ParseException e) {
+            txtPresion = new JTextField(); 
+        }
+
         txtPresion.setBounds(280, 30, 100, 25);
         panelClinico.add(txtPresion);
 
@@ -318,12 +325,15 @@ public class FormTriaje extends JDialog {
     private void procesarInicioConsulta() {
         String sintomas = txtSintomas.getText().trim();
         float peso = Float.parseFloat(spnPeso.getValue().toString());
-        String presion = txtPresion.getText().trim();
-        
-        if (sintomas.isEmpty() || presion.isEmpty()) {
+        String presionRaw = txtPresion.getText();
+        boolean presionVacia = presionRaw.replace("/", "").replace("_", "").trim().isEmpty();
+
+        if (sintomas.isEmpty() || presionVacia) {
             JOptionPane.showMessageDialog(this, "Por favor complete los campos de Síntomas y Presión Arterial.", "Faltan Datos Clínicos", JOptionPane.WARNING_MESSAGE);
             return;
         }
+
+        String presion = txtPresion.getText();
 
         String nombreFinal = "";
         String apellidoFinal = "";

@@ -28,6 +28,7 @@ public class PrincipalSecretaria extends JFrame {
 
         setTitle("Panel de Secretaria - " + (secretariaLogueada != null ? secretariaLogueada.getName() : ""));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setBounds(100, 100, 1280, 720);
         setLocationRelativeTo(null);
         

@@ -313,24 +313,35 @@ public class FormAgendarCita extends JDialog {
     private void cargarHorasDisponibles() {
         cbxHora.removeAllItems();
         Medico medicoSel = (Medico) cbxMedico.getSelectedItem();
-        
-        if (medicoSel == null || fechaSeleccionada == null) {
-            cbxHora.setEnabled(false);
-            return;
+        if(medicoSel != null && fechaSeleccionada!= null) {
+        	ArrayList<LocalTime> slots = medicoSel.getSlotsDisponibles(fechaSeleccionada);
+        	LocalDateTime ahora = LocalDateTime.now();
+        	
+        	if(slots.isEmpty()) {
+        		cbxHora.addItem("---");
+        		cbxHora.setEnabled(false);
+        	}
+        	else {
+        		boolean cupoDisponible = false;
+        		
+        		for(LocalTime hora: slots) {
+        			LocalDateTime fechaHoraSlot = LocalDateTime.of(fechaSeleccionada, hora);
+        			
+        			if(fechaHoraSlot.isAfter(ahora)) {
+        				cbxHora.addItem(hora.toString());
+        				cupoDisponible = true;
+        			}
+        		}
+        		if(!cupoDisponible) {
+        			cbxHora.addItem("Sin horas futuras");
+        			cbxHora.setEnabled(false);
+        		}
+        		else {
+        			cbxHora.setEnabled(true);
+        		}
+        	}
         }
-        
-        ArrayList<LocalTime> slots = medicoSel.getSlotsDisponibles(fechaSeleccionada);
-        
-        if (slots.isEmpty()) {
-            cbxHora.addItem("Sin cupo");
-            cbxHora.setEnabled(false);
-        } else {
-            cbxHora.setEnabled(true);
-            for (LocalTime hora : slots) {
-                cbxHora.addItem(hora.toString());
-            }
-        }
-    }
+    } 
     
     private void guardarCita() {
         String cedulaLimpia = txtCedula.getText().replace("-", "").replace("_", "").trim();

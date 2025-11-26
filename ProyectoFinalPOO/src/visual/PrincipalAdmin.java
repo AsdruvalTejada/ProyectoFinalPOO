@@ -28,7 +28,7 @@ public class PrincipalAdmin extends JFrame {
     private JPanel pnlMainContent;
     private CardLayout cardLayout;
     
-    private Color COLOR_SIDEBAR = new Color(10, 186, 181);
+    private Color COLOR_SIDEBAR = new Color(0, 51, 102);
     private Color COLOR_BACKGROUND = new Color(248, 249, 250);
     private Color COLOR_TEXT_LIGHT = Color.WHITE;
     private Color COLOR_ACCENT = new Color(86, 223, 207);
@@ -37,6 +37,7 @@ public class PrincipalAdmin extends JFrame {
         
         setTitle("Panel de Administración - Clínica");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setBounds(100, 100, 1024, 768);
         setLocationRelativeTo(null);
         

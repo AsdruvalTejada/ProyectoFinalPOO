@@ -39,7 +39,7 @@ public class CalendarioSecretaria extends JPanel {
     private YearMonth mesActual;
     private Secretaria secretariaLogueada;
 
-    private final Color COLOR_TEAL_PRINCIPAL = new Color(10, 186, 181);
+    private final Color COLOR_TEAL_PRINCIPAL = new Color(0, 51, 102);
     private final Color COLOR_FONDO_BLANCO   = Color.WHITE;
     private final Color COLOR_TEXTO_OSCURO   = new Color(50, 50, 50);
     private final Color COLOR_TEXTO_BLANCO   = Color.WHITE;

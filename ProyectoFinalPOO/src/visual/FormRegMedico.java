@@ -161,7 +161,6 @@ public class FormRegMedico extends JDialog {
         panelForm.add(lblTituloPro);
 
         crearLabel("Especialidad:", 30, 230, panelForm);
-        // CAMBIO: Ahora es un JComboBox
         cbxEspecialidad = new JComboBox<>(LISTA_ESPECIALIDADES);
         cbxEspecialidad.setBackground(Color.WHITE);
         cbxEspecialidad.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -170,7 +169,7 @@ public class FormRegMedico extends JDialog {
 
         crearLabel("Duración Cita:", 30, 270, panelForm);
         spnDuracion = new JSpinner();
-        spnDuracion.setModel(new SpinnerNumberModel(30, 10, 120, 5)); 
+        spnDuracion.setModel(new SpinnerNumberModel(30, 30, 120, 5)); 
         spnDuracion.setBounds(140, 270, 60, 25);
         panelForm.add(spnDuracion);
         
@@ -253,8 +252,7 @@ public class FormRegMedico extends JDialog {
             txtApellido.setText(medicoEdicion.getApellido());
             txtTelefono.setValue(medicoEdicion.getContacto()); 
             txtTelefono.setText(medicoEdicion.getContacto()); 
-            
-            // CAMBIO: Cargar especialidad en el ComboBox
+
             cbxEspecialidad.setSelectedItem(medicoEdicion.getEspecialidad());
             
             cbxSexo.setSelectedItem(medicoEdicion.getSexo());
