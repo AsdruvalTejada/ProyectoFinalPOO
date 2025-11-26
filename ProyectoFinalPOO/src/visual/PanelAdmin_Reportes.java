@@ -18,8 +18,10 @@ import java.io.FileOutputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -43,6 +45,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 import logico.Consulta;
 import logico.Enfermedad;
+import logico.Medico;
 import logico.Paciente;
 import logico.SistemaGestion;
 
@@ -91,8 +94,109 @@ public class PanelAdmin_Reportes extends JPanel {
         tabbedPane.addTab("Demografía por Enfermedad", new PanelCircularInteractivo());
         tabbedPane.addTab("Tendencia Anual", new PanelLineasInteractivo());
         tabbedPane.addTab("Cobertura de Vacunación", new PanelVacunas());
+        tabbedPane.addTab("Top 5 Enfermedades", new PanelTop5());
+
+        tabbedPane.addTab("Productividad Médica", new PanelProductividad());
 
         add(tabbedPane, BorderLayout.CENTER);
+    }
+
+    private class PanelProductividad extends JPanel {
+        private static final long serialVersionUID = 1L;
+        private Map<String, Integer> datosMedicos;
+        private Map<Shape, String> tooltipsMap = new HashMap<>();
+
+        public PanelProductividad() {
+            setBackground(COLOR_FONDO);
+            setLayout(new BorderLayout());
+            setBorder(new LineBorder(new Color(230, 230, 230), 1));
+            calcularDatos();
+            setToolTipText("");
+        }
+
+        private void calcularDatos() {
+            datosMedicos = new HashMap<>();
+            for (Paciente p : SistemaGestion.getInstance().getListaPacientes()) {
+                for (Consulta c : p.getHistorialConsultas()) {
+                    if (c.getMedico() != null) {
+                        String nombreDoc = "Dr. " + c.getMedico().getApellido();
+                        datosMedicos.put(nombreDoc, datosMedicos.getOrDefault(nombreDoc, 0) + 1);
+                    }
+                }
+            }
+            
+            for (Medico m : SistemaGestion.getInstance().getListaMedicos()) {
+                String nombreDoc = "Dr. " + m.getApellido();
+                if (!datosMedicos.containsKey(nombreDoc)) {
+                    datosMedicos.put(nombreDoc, 0);
+                }
+            }
+        }
+        
+        @Override
+        public String getToolTipText(java.awt.event.MouseEvent event) {
+            for (Map.Entry<Shape, String> entry : tooltipsMap.entrySet()) {
+                if (entry.getKey().contains(event.getPoint())) return entry.getValue();
+            } return null;
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            tooltipsMap.clear();
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            if (datosMedicos == null || datosMedicos.isEmpty()) {
+                g2d.setColor(Color.GRAY);
+                g2d.drawString("No hay datos de médicos.", 50, 100);
+                return;
+            }
+
+            int w = getWidth(); int h = getHeight(); int pad = 80;
+            g2d.setColor(Color.GRAY); g2d.setStroke(new BasicStroke(2));
+            g2d.drawLine(pad, h - pad, pad, pad);
+            g2d.drawLine(pad, h - pad, w - pad, h - pad);
+
+            int maxVal = datosMedicos.values().stream().max(Integer::compare).orElse(1);
+            if (maxVal == 0) maxVal = 1;
+            
+            ArrayList<Map.Entry<String, Integer>> listaOrdenada = new ArrayList<>(datosMedicos.entrySet());
+            listaOrdenada.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
+
+            int barHeight = (h - 2 * pad) / (listaOrdenada.size() * 2);
+            if (barHeight > 50) barHeight = 50;
+            int y = pad + 20;
+            int colorIdx = 0;
+
+            g2d.setColor(Color.BLACK);
+            g2d.setFont(new Font("Segoe UI", Font.BOLD, 18));
+            g2d.drawString("CONSULTAS POR MÉDICO", pad, pad - 40);
+
+            for (Map.Entry<String, Integer> entry : listaOrdenada) {
+                int val = entry.getValue();
+                int barWidth = (int) ((double) val / maxVal * (w - 2 * pad - 50));
+                
+                Rectangle barRect = new Rectangle(pad, y, barWidth, barHeight);
+                tooltipsMap.put(barRect, entry.getKey() + ": " + val + " consultas");
+                
+                g2d.setColor(COLORES_GRAFICOS[colorIdx % COLORES_GRAFICOS.length]);
+                g2d.fillRect(pad, y, barWidth, barHeight);
+                
+                g2d.setColor(Color.BLACK);
+                g2d.setFont(new Font("Segoe UI", Font.BOLD, 12));
+                g2d.drawString(String.valueOf(val), pad + barWidth + 10, y + barHeight/2 + 5);
+
+                g2d.setColor(Color.DARK_GRAY);
+                g2d.setFont(new Font("Segoe UI", Font.BOLD, 12));
+                String lbl = entry.getKey();
+                int lblW = g2d.getFontMetrics().stringWidth(lbl);
+                g2d.drawString(lbl, pad - lblW - 10, y + barHeight/2 + 5);
+
+                y += barHeight + 30;
+                colorIdx++;
+            }
+        }
     }
 
     private class PanelVigilancia extends JPanel {
@@ -350,6 +454,103 @@ public class PanelAdmin_Reportes extends JPanel {
         }
     }
 
+    private class PanelTop5 extends JPanel {
+        private static final long serialVersionUID = 1L;
+        private Map<String, Integer> datosTop5;
+        private Map<Shape, String> tooltipsMap = new HashMap<>();
+
+        public PanelTop5() {
+            setBackground(COLOR_FONDO);
+            setLayout(new BorderLayout());
+            setBorder(new LineBorder(new Color(230, 230, 230), 1));
+            calcularDatos();
+            setToolTipText("");
+        }
+
+        private void calcularDatos() {
+            Map<Enfermedad, Integer> conteoCompleto = SistemaGestion.getInstance().getReporteEnfermedades();
+            ArrayList<Map.Entry<Enfermedad, Integer>> lista = new ArrayList<>(conteoCompleto.entrySet());
+            lista.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue())); 
+            
+            datosTop5 = new HashMap<>();
+             int max = Math.min(5, lista.size());
+             for(int i=0; i<max; i++) {
+                 datosTop5.put(lista.get(i).getKey().getNombre(), lista.get(i).getValue());
+             }
+        }
+        
+        @Override
+        public String getToolTipText(java.awt.event.MouseEvent event) {
+            for (Map.Entry<Shape, String> entry : tooltipsMap.entrySet()) {
+                if (entry.getKey().contains(event.getPoint())) return entry.getValue();
+            } return null;
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            tooltipsMap.clear();
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            if (datosTop5 == null || datosTop5.isEmpty()) {
+                g2d.setColor(Color.GRAY);
+                g2d.setFont(new Font("Segoe UI", Font.ITALIC, 16));
+                g2d.drawString("No hay suficientes datos para el Top 5.", 50, 100);
+                return;
+            }
+
+            int w = getWidth(); int h = getHeight(); int pad = 80;
+            g2d.setColor(Color.GRAY); g2d.setStroke(new BasicStroke(2));
+            g2d.drawLine(pad, h - pad, w - pad, h - pad); 
+            g2d.drawLine(pad, h - pad, pad, pad); 
+
+            int maxVal = datosTop5.values().stream().max(Integer::compare).orElse(1);
+            ArrayList<Map.Entry<String, Integer>> listaOrdenada = new ArrayList<>(datosTop5.entrySet());
+            listaOrdenada.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
+
+            int barWidth = (w - 2 * pad) / (listaOrdenada.size() * 2);
+            if (barWidth > 100) barWidth = 100;
+            int x = pad + 40;
+            int colorIdx = 0;
+
+            g2d.setColor(Color.BLACK);
+            g2d.setFont(new Font("Segoe UI", Font.BOLD, 18));
+            g2d.drawString("TOP 5 ENFERMEDADES MÁS FRECUENTES", pad, pad - 40);
+
+            for (Map.Entry<String, Integer> entry : listaOrdenada) {
+                int val = entry.getValue();
+                int barHeight = (int) ((double) val / maxVal * (h - 2 * pad));
+                
+                Rectangle barRect = new Rectangle(x, h - pad - barHeight, barWidth, barHeight);
+                tooltipsMap.put(barRect, entry.getKey() + ": " + val + " casos");
+                
+                g2d.setColor(COLORES_GRAFICOS[colorIdx % COLORES_GRAFICOS.length]);
+                g2d.fillRect(x, h - pad - barHeight, barWidth, barHeight);
+                
+                g2d.setColor(Color.WHITE);
+                g2d.setStroke(new BasicStroke(1));
+                g2d.drawRect(x, h - pad - barHeight, barWidth, barHeight);
+                
+                g2d.setColor(Color.BLACK);
+                g2d.setFont(new Font("Segoe UI", Font.BOLD, 14));
+                String valStr = String.valueOf(val);
+                int valW = g2d.getFontMetrics().stringWidth(valStr);
+                g2d.drawString(valStr, x + (barWidth - valW)/2, h - pad - barHeight - 5);
+
+                g2d.setColor(Color.DARK_GRAY);
+                g2d.setFont(new Font("Segoe UI", Font.BOLD, 11));
+                String lbl = entry.getKey();
+                if (lbl.length() > 10) lbl = lbl.substring(0, 8) + "..";
+                int lblW = g2d.getFontMetrics().stringWidth(lbl);
+                g2d.drawString(lbl, x + (barWidth - lblW)/2, h - pad + 20);
+
+                x += barWidth + 60;
+                colorIdx++;
+            }
+        }
+    }
+
     private void exportarPDF() {
         try {
             File carpeta = new File("Reportes");
@@ -363,7 +564,7 @@ public class PanelAdmin_Reportes extends JPanel {
             document.open();
 
             com.itextpdf.text.Font fontTitulo = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 18, com.itextpdf.text.Font.BOLD, BaseColor.DARK_GRAY);
-            Paragraph titulo = new Paragraph("DOC.JAVA - SISTEMA DE INTELIGENCIA CLÍNICA", fontTitulo);
+            Paragraph titulo = new Paragraph("- SISTEMA DE REPORTES DE LA CLÍNICA -", fontTitulo);
             titulo.setAlignment(Element.ALIGN_CENTER);
             titulo.setSpacingAfter(20);
             document.add(titulo);
@@ -389,7 +590,6 @@ public class PanelAdmin_Reportes extends JPanel {
             document.add(new Paragraph("Detalle de Datos:", new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 12, com.itextpdf.text.Font.BOLD)));
             document.add(new Paragraph(" "));
             
-            // 1. TABLA ENFERMEDADES
             document.add(new Paragraph("1. Vigilancia Epidemiológica", new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 11, com.itextpdf.text.Font.BOLD)));
             PdfPTable tablaEnf = new PdfPTable(2);
             tablaEnf.setWidthPercentage(100);
