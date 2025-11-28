@@ -59,7 +59,7 @@ public class FormAgendarCita extends JDialog {
     private boolean modoSeleccionFecha = false; 
     
     private final Color COLOR_FONDO       = new Color(254, 251, 246);
-    private final Color COLOR_TEAL        = new Color(10, 186, 181); 
+    private final Color COLOR_TEAL        = new Color(0, 51, 102); 
     private final Color COLOR_ACCENT      = new Color(0, 200, 151);
     private final Color COLOR_TEXTO       = new Color(50, 50, 50);
     private final Color COLOR_BLOQUEADO   = new Color(230, 230, 230);

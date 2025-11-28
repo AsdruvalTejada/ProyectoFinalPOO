@@ -48,7 +48,7 @@ public class PanelConsultaActiva extends JDialog {
     private JTable tableVacunas;
     private DefaultTableModel modelVacunas;
 
-    private final Color COLOR_THEME = new Color(0, 190, 165); 
+    private final Color COLOR_THEME = new Color(0, 51, 102); 
     private final Color COLOR_BG = Color.WHITE;
     private final Color COLOR_TEXTO_HEADER = new Color(0, 150, 136); 
     private final Color COLOR_TEXTO = new Color(60, 60, 60);
