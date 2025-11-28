@@ -433,7 +433,7 @@ public class PrincipalMedico extends JFrame {
                 
                 while(true) {
                     String mensaje = in.readUTF();
-                    if (mensaje.startsWith("ALERTA:")) {
+                    if (mensaje.startsWith("RECORDATORIO:")) {
                         String textoAlerta = mensaje.split(":")[1];
                         javax.swing.SwingUtilities.invokeLater(() -> {
                             DesktopNotify.showDesktopMessage(
