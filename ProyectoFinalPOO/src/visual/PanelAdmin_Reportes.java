@@ -551,7 +551,8 @@ public class PanelAdmin_Reportes extends JPanel {
         }
     }
 
-    private void exportarPDF() {
+    @SuppressWarnings("unused")
+	private void exportarPDF() {
         try {
             File carpeta = new File("Reportes");
             if (!carpeta.exists()) carpeta.mkdir();

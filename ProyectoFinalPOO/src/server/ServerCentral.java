@@ -82,4 +82,12 @@ public class ServerCentral {
             System.out.println("Nueva alerta registrada para Dr. " + idMed + " a las " + hora);
         }
     }
+    
+    public static void broadcast(String mensaje) {
+        synchronized (medicosConectados) {
+            for (Conexion conn : medicosConectados.values()) {
+                conn.enviarMensaje(mensaje);
+            }
+        }
+    }
 }

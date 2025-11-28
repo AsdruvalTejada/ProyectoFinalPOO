@@ -1,12 +1,9 @@
 package logico;
 
 import java.util.ArrayList;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.TextStyle;
-import java.util.Locale;
 
 public class Medico extends Persona {
 	private static final long serialVersionUID = 1L;

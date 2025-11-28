@@ -312,6 +312,21 @@ public class PanelConsultaActiva extends JDialog {
         );
         
         if (exito) {
+        	new Thread(() -> {
+                try {
+                    java.net.Socket s = new java.net.Socket("127.0.0.1", 7000);
+                    java.io.DataOutputStream out = new java.io.DataOutputStream(s.getOutputStream());
+                    
+                    String datos = SistemaGestion.getInstance().getDatosVigilanciaSocket();
+                    
+                    out.writeUTF("LOGIN:REPORTER");
+                    out.writeUTF("STATS_UPDATE;" + datos);
+                    
+                    s.close();
+                } catch (Exception ex) {
+                    System.out.println("No se pudo enviar actualización al monitor.");
+                }
+            }).start();
             JOptionPane.showMessageDialog(this, "Consulta finalizada correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             dispose();
         } else {
