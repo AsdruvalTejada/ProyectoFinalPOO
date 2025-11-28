@@ -33,6 +33,13 @@ public class Conexion extends Thread {
 
 					ServerCentral.agregarAlerta(partes[1], partes[2], partes[3]);
 				}
+                else if (mensaje.startsWith("STATS_UPDATE;")) {
+                	
+                    String datos = mensaje.split(";", 2)[1];
+                    
+                    ServerCentral.broadcast("VIGILANCIA;" + datos);
+                    System.out.println("Difundiendo actualización epidemiológica...");
+                }
 			}
 		} catch (IOException e) {
 			if(idUsuario != null) ServerCentral.medicosConectados.remove(idUsuario);

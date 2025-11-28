@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.io.*;
-//clase controladora
 public class SistemaGestion implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
@@ -432,7 +431,6 @@ public class SistemaGestion implements Serializable{
             String nombreVacuna = vacCatalogo.getNombre();
 
             for (Paciente paciente : this.listaPacientes) {
-                // Usamos getOrDefault por seguridad
                 Boolean estaAplicada = paciente.getRegistroVacunacion().get(vacCatalogo);
                 
                 if (estaAplicada != null && estaAplicada) {
@@ -459,6 +457,35 @@ public class SistemaGestion implements Serializable{
         } catch (Exception e) {
             e.printStackTrace();
             return false;
-        }//
+        }   
+    }
+    
+    public String getDatosVigilanciaSocket() {
+        HashMap<String, Integer> contador = new HashMap<>();
+        
+        for (Enfermedad enf : catalogoEnfermedades) {
+            if (enf.getEstaBajoVigilancia()) {
+                contador.put(enf.getNombre(), 0);
+            }
+        }
+        
+        for (Paciente pac : listaPacientes) {
+            for (Consulta cons : pac.getHistorialConsultas()) {
+                Enfermedad diag = cons.getDiagnostico();
+                if (diag != null && diag.getEstaBajoVigilancia()) {
+                    String nombre = diag.getNombre();
+                    if (contador.containsKey(nombre)) {
+                        contador.put(nombre, contador.get(nombre) + 1);
+                    }
+                }
+            }
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        for (String key : contador.keySet()) {
+            sb.append(key).append(":").append(contador.get(key)).append(";");
+        }
+        
+        return sb.toString(); 
     }
 }

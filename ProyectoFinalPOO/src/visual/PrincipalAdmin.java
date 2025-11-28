@@ -1,18 +1,19 @@
 package visual;
 
 import java.awt.BorderLayout;
-
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -27,6 +28,8 @@ public class PrincipalAdmin extends JFrame {
     private JPanel pnlSidebar;
     private JPanel pnlMainContent;
     private CardLayout cardLayout;
+    
+    private PanelVigilancia panelVigilancia;
     
     private Color COLOR_SIDEBAR = new Color(0, 51, 102);
     private Color COLOR_BACKGROUND = new Color(248, 249, 250);
@@ -47,15 +50,14 @@ public class PrincipalAdmin extends JFrame {
 
         pnlSidebar = new JPanel();
         pnlSidebar.setBackground(COLOR_SIDEBAR);
-        pnlSidebar.setLayout(new GridLayout(12, 1, 0, 0)); 
+        pnlSidebar.setPreferredSize(new Dimension(220, 0));
+        pnlSidebar.setLayout(new BorderLayout());
         contentPane.add(pnlSidebar, BorderLayout.WEST);
 
-        cardLayout = new CardLayout();
-        pnlMainContent = new JPanel(cardLayout);
-        pnlMainContent.setBackground(COLOR_BACKGROUND);
-        pnlMainContent.setBorder(new EmptyBorder(10, 10, 10, 10));
-        contentPane.add(pnlMainContent, BorderLayout.CENTER);
-
+        JPanel pnlMenuNorte = new JPanel(new GridLayout(0, 1, 0, 5));
+        pnlMenuNorte.setBackground(COLOR_SIDEBAR);
+        pnlMenuNorte.setBorder(new EmptyBorder(20, 0, 20, 0));
+        
         JButton btnCitas = createSidebarButton("Gestión de Citas");
         JButton btnPacientes = createSidebarButton("Gestión de Pacientes");
         JButton btnPersonal = createSidebarButton("Gestión de Personal");
@@ -63,20 +65,35 @@ public class PrincipalAdmin extends JFrame {
         JButton btnReportes = createSidebarButton("Reportes");
         JButton btnCatalogos = createSidebarButton("Catálogos");
         
-        pnlSidebar.add(btnCitas);
-        pnlSidebar.add(btnPacientes);
-        pnlSidebar.add(btnPersonal);
-        pnlSidebar.add(btnUsuarios);
-        pnlSidebar.add(btnReportes);
-        pnlSidebar.add(btnCatalogos);
+        pnlMenuNorte.add(btnCitas);
+        pnlMenuNorte.add(btnPacientes);
+        pnlMenuNorte.add(btnPersonal);
+        pnlMenuNorte.add(btnUsuarios);
+        pnlMenuNorte.add(btnReportes);
+        pnlMenuNorte.add(btnCatalogos);
         
-        pnlSidebar.add(new JLabel("")); 
-        pnlSidebar.add(new JLabel("")); 
-        pnlSidebar.add(new JLabel("")); 
-        pnlSidebar.add(new JLabel("")); 
+        pnlSidebar.add(pnlMenuNorte, BorderLayout.NORTH);
+
+        JPanel pnlMenuCentro = new JPanel();
+        pnlMenuCentro.setLayout(new BoxLayout(pnlMenuCentro, BoxLayout.Y_AXIS));
+        pnlMenuCentro.setBackground(COLOR_SIDEBAR);
+        pnlMenuCentro.setBorder(new EmptyBorder(10, 10, 10, 10));
+        
+        panelVigilancia = new PanelVigilancia();
+        panelVigilancia.actualizarDatos(SistemaGestion.getInstance().getDatosVigilanciaSocket());
+        panelVigilancia.setAlignmentX(JPanel.CENTER_ALIGNMENT);
+        
+        pnlMenuCentro.add(Box.createVerticalGlue());
+        pnlMenuCentro.add(panelVigilancia);
+        pnlMenuCentro.add(Box.createVerticalGlue());
+        
+        pnlSidebar.add(pnlMenuCentro, BorderLayout.CENTER);
+
+        JPanel pnlMenuSur = new JPanel(new GridLayout(0, 1, 0, 5));
+        pnlMenuSur.setBackground(COLOR_SIDEBAR);
+        pnlMenuSur.setBorder(new EmptyBorder(0, 0, 20, 0));
         
         JButton btnBackup = createSidebarButton("Crear Backup");
-        pnlSidebar.add(btnBackup);
         btnBackup.addActionListener(e -> {
             new Thread(() -> {
                 boolean exito = SistemaGestion.getInstance().respaldoRemoto();
@@ -89,10 +106,20 @@ public class PrincipalAdmin extends JFrame {
                 });
             }).start();
         });
-
+        
         JButton btnLogout = createSidebarButton("Cerrar Sesión");
         btnLogout.addActionListener(e -> cerrarSesion());
-        pnlSidebar.add(btnLogout);
+        
+        pnlMenuSur.add(btnBackup);
+        pnlMenuSur.add(btnLogout);
+        
+        pnlSidebar.add(pnlMenuSur, BorderLayout.SOUTH);
+
+        cardLayout = new CardLayout();
+        pnlMainContent = new JPanel(cardLayout);
+        pnlMainContent.setBackground(COLOR_BACKGROUND);
+        pnlMainContent.setBorder(new EmptyBorder(10, 10, 10, 10));
+        contentPane.add(pnlMainContent, BorderLayout.CENTER);
 
         JPanel panelCitas = new PanelAdmin_Citas(COLOR_ACCENT); 
         JPanel panelPacientes = new PanelAdmin_Pacientes(COLOR_ACCENT);
@@ -117,6 +144,7 @@ public class PrincipalAdmin extends JFrame {
         
         cardLayout.show(pnlMainContent, "pacientes");
         
+        iniciarEscuchaVigilancia();
     }
     
     private void cerrarSesion() {
@@ -137,6 +165,7 @@ public class PrincipalAdmin extends JFrame {
         button.setBorderPainted(false);
         button.setOpaque(true);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.setPreferredSize(new Dimension(220, 50));
         
         button.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent evt) {
@@ -149,4 +178,30 @@ public class PrincipalAdmin extends JFrame {
         return button;
     }
     
+    private void iniciarEscuchaVigilancia() {
+        new Thread(() -> {
+            try {
+                @SuppressWarnings("resource")
+                java.net.Socket s = new java.net.Socket("127.0.0.1", 7000);
+                java.io.DataInputStream in = new java.io.DataInputStream(s.getInputStream());
+                java.io.DataOutputStream out = new java.io.DataOutputStream(s.getOutputStream());
+                
+                out.writeUTF("LOGIN:ADMIN_MONITOR"); 
+                
+                while(true) {
+                    String msg = in.readUTF();
+                    
+                    if (msg.startsWith("VIGILANCIA;")) {
+                        String datos = msg.split(";", 2)[1];
+                        
+                        javax.swing.SwingUtilities.invokeLater(() -> {
+                            panelVigilancia.actualizarDatos(datos);
+                        });
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Monitor desconectado del servidor.");
+            }
+        }).start();
+    }
 }
