@@ -45,11 +45,9 @@ public class FormTriaje extends JDialog {
     private String idCita;
     private boolean esPacienteNuevo = false;
     private Paciente pacienteExistente = null;
-
     private JSpinner spnPeso;
     private JTextField txtPresion;
     private JTextArea txtSintomas;
-
     private JPanel panelDatosPersonales;
     private JTextField txtNombre;
     private JTextField txtApellido;
@@ -59,7 +57,7 @@ public class FormTriaje extends JDialog {
     private JComboBox<String> cbxTipoSangre;
     private JSpinner spnEstatura;
 
-    private final Color COLOR_THEME = new Color(0, 190, 165);
+    private final Color COLOR_THEME = new Color(0, 51, 102);
     private final Color COLOR_BG = Color.WHITE;
     private final Color COLOR_BORDER = new Color(200, 200, 200);
     private final Color COLOR_TEXTO = new Color(60, 60, 60);
@@ -97,7 +95,6 @@ public class FormTriaje extends JDialog {
             dispose(); 
             return;    
         }
-        
         pacienteExistente = SistemaGestion.getInstance().buscarPacientePorId(cita.getIdPaciente());
         esPacienteNuevo = (pacienteExistente == null);
 
@@ -118,6 +115,21 @@ public class FormTriaje extends JDialog {
         spnPeso = new JSpinner();
         spnPeso.setModel(new SpinnerNumberModel(150.0, 1.0, 500.0, 1.0));
         spnPeso.setBounds(90, 30, 80, 25);
+        JSpinner.NumberEditor editorPeso = (JSpinner.NumberEditor) spnPeso.getEditor();
+        javax.swing.JFormattedTextField txtPeso = editorPeso.getTextField();
+
+        txtPeso.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                char c = evt.getKeyChar();
+
+                if (!Character.isDigit(c) && c != '.' && c != '\b') {
+                    evt.consume(); 
+                }
+                if (c == '.' && txtPeso.getText().contains(".")) {
+                    evt.consume();
+                }
+            }
+        });
         panelClinico.add(spnPeso);
 
         JLabel lblPresion = new JLabel("Presión:");
