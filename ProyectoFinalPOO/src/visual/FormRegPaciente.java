@@ -193,6 +193,7 @@ public class FormRegPaciente extends JDialog {
         if(pacienteEdicion != null) {
             txtId.setText(pacienteEdicion.getId());
             txtId.setEditable(false);
+            txtId.setFocusable(false);
             txtId.setBackground(new Color(230, 230, 230));
             
             txtNombre.setText(pacienteEdicion.getName());
