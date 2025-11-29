@@ -167,7 +167,7 @@ public class FormGestionAgenda extends JDialog {
 
     private void cargarDatos() {
         modelJornada.setRowCount(0);
-
+//
         for (String diaEsp : DIAS_SEMANA) { 
             
             TurnoJornada turnoEncontrado = null;
