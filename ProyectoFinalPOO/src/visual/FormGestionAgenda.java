@@ -28,6 +28,7 @@ import javax.swing.table.DefaultTableModel;
 import logico.BloqueoAgenda;
 import logico.Medico;
 import logico.TurnoJornada;
+import logico.SistemaGestion;
 
 @SuppressWarnings("serial")
 public class FormGestionAgenda extends JDialog {
@@ -38,6 +39,7 @@ public class FormGestionAgenda extends JDialog {
     private DefaultTableModel modelJornada;
     private JTable tableBloqueos;
     private DefaultTableModel modelBloqueos;
+    private final String[] DIAS_SEMANA = {"LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO", "DOMINGO"};
 
     private JSpinner spnFechaBloqueo;
     private JComboBox<String> cbxHoraInicio;
@@ -165,14 +167,37 @@ public class FormGestionAgenda extends JDialog {
 
     private void cargarDatos() {
         modelJornada.setRowCount(0);
-        for(TurnoJornada t : medico.getHorarioFijo()) {
-            modelJornada.addRow(new Object[] {
-                t.getDiaSemana(),
-                t.isActivo(),
-                t.getHoraInicio().toString(),
-                t.getHoraFin().toString()
-            });
+
+        for (String diaEsp : DIAS_SEMANA) { 
+            
+            TurnoJornada turnoEncontrado = null;
+            for (TurnoJornada t : medico.getHorarioFijo()) {
+
+                if (t != null) {
+                     String diaGuardado = t.getDiaSemana().toString().toUpperCase();
+                     
+                     if (diaGuardado.equals(diaEsp) || esTraduccion(diaGuardado, diaEsp)) {
+                         turnoEncontrado = t;
+
+                     }
+                }
+            }
+
+            if (turnoEncontrado != null) {
+                modelJornada.addRow(new Object[]{diaEsp, true, turnoEncontrado.getHoraInicio().toString(), 
+                turnoEncontrado.getHoraFin().toString()
+                });
+            } else {
+
+                modelJornada.addRow(new Object[]{
+                    diaEsp, 
+                    false, 
+                    "08:00", 
+                    "17:00"
+                });
+            }
         }
+
         modelBloqueos.setRowCount(0);
         for(BloqueoAgenda b : medico.getExceptHorario()) {
             modelBloqueos.addRow(new Object[] {
@@ -184,26 +209,34 @@ public class FormGestionAgenda extends JDialog {
     }
     
     private void guardarCambiosJornada() {
+        medico.getHorarioFijo().clear(); 
+        
         for(int i=0; i<tableJornada.getRowCount(); i++) {
             boolean activo = (boolean) modelJornada.getValueAt(i, 1);
-            String iniStr = (String) modelJornada.getValueAt(i, 2);
-            String finStr = (String) modelJornada.getValueAt(i, 3);
-            
-            try {
-                LocalTime ini = LocalTime.parse(iniStr);
-                LocalTime fin = LocalTime.parse(finStr);
+
+            if (activo) {
+                String diaEsp = (String) modelJornada.getValueAt(i, 0);
+                String iniStr = (String) modelJornada.getValueAt(i, 2);
+                String finStr = (String) modelJornada.getValueAt(i, 3);
                 
-                TurnoJornada turno = medico.getHorarioFijo().get(i);
-                turno.setActivo(activo);
-                turno.setHoraInicio(ini);
-                turno.setHoraFin(fin);
-                
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error en formato de hora fila " + (i+1) + " (Use HH:mm)");
-                return;
+                try {
+                    String diaIngles = getInglesDe(diaEsp);
+                    LocalTime ini = LocalTime.parse(iniStr);
+                    LocalTime fin = LocalTime.parse(finStr);
+
+                    TurnoJornada nuevoTurno = new TurnoJornada(diaIngles, ini, fin, activo);
+                    medico.getHorarioFijo().add(nuevoTurno);
+                    
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, "Error en formato de hora fila " + (i+1) + " (Use HH:mm)");
+                    return;
+                }
             }
         }
+
+        SistemaGestion.getInstance().guardarDatos();
         JOptionPane.showMessageDialog(this, "Horario actualizado correctamente.");
+        dispose();
     }
     
     private void agregarBloqueo() {
@@ -244,6 +277,46 @@ public class FormGestionAgenda extends JDialog {
         if(row != -1) {
             medico.getExceptHorario().remove(row);
             cargarDatos();
+        }
+    }
+    private boolean esTraduccion(String diaGuardado, String diaEsp) {
+        switch (diaEsp) {
+            case "LUNES": 
+            	return diaGuardado.equals("MONDAY");
+            case "MARTES": 
+            	return diaGuardado.equals("TUESDAY");
+            case "MIERCOLES": 
+            	return diaGuardado.equals("WEDNESDAY");
+            case "JUEVES": 
+            	return diaGuardado.equals("THURSDAY");
+            case "VIERNES": 
+            	return diaGuardado.equals("FRIDAY");
+            case "SABADO": 
+            	return diaGuardado.equals("SATURDAY");
+            case "DOMINGO": 
+            	return diaGuardado.equals("SUNDAY");
+            default: 
+            	return false;
+        }
+    }
+    private String getInglesDe(String diaEsp) {
+        switch (diaEsp) {
+            case "LUNES": 
+            	return "MONDAY";
+            case "MARTES": 
+            	return "TUESDAY";
+            case "MIERCOLES": 
+            	return "WEDNESDAY";
+            case "JUEVES": 
+            	return "THURSDAY";
+            case "VIERNES": 
+            	return "FRIDAY";
+            case "SABADO": 
+            	return "SATURDAY";
+            case "DOMINGO": 
+            	return "SUNDAY";
+            default: 
+            	return diaEsp;
         }
     }
 }
