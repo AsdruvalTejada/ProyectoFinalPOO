@@ -87,13 +87,19 @@ public class PanelAdmin_Pacientes extends JPanel {
         pnlBotones.add(lblSep);
         
         JButton btnEditar = new JButton("Modificar Datos");
-        estilizarBoton(btnEditar, new Color(86, 223, 207));
+        estilizarBoton(btnEditar, colorAccent);
+        btnEditar.setForeground(Color.WHITE);
         btnEditar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 editarPaciente();
             }
         });
         pnlBotones.add(btnEditar);
+        
+        JButton btnHistorial = new JButton("Ver Historial");
+        estilizarBoton(btnHistorial, new Color(13, 110, 253));
+        btnHistorial.addActionListener(e -> verHistorialPaciente());
+        pnlBotones.add(btnHistorial);
         
         JButton btnEliminar = new JButton("Eliminar");
         estilizarBoton(btnEliminar, new Color(220, 53, 69));
@@ -143,6 +149,22 @@ public class PanelAdmin_Pacientes extends JPanel {
             FormRegPaciente form = new FormRegPaciente(p);
             form.setVisible(true);
             cargarPacientes();
+        }
+    }
+    
+    private void verHistorialPaciente() {
+        int row = tablePacientes.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Seleccione un paciente.");
+            return;
+        }
+        
+        String id = (String) model.getValueAt(row, 0);
+        Paciente p = SistemaGestion.getInstance().buscarPacientePorId(id);
+        
+        if(p != null) {
+            HistorialPaciente historial = new HistorialPaciente(p);
+            historial.setVisible(true);
         }
     }
 

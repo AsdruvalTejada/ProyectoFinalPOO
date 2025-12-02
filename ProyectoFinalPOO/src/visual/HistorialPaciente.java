@@ -35,7 +35,16 @@ public class HistorialPaciente extends JDialog {
     public HistorialPaciente(Paciente paciente, Medico medico) {
         this.paciente = paciente;
         this.medicoLogueado = medico;
-        
+        initUI();
+    }
+
+    public HistorialPaciente(Paciente paciente) {
+        this.paciente = paciente;
+        this.medicoLogueado = null;
+        initUI();
+    }
+
+    private void initUI() {
         setTitle("Historial Médico: " + paciente.getNombreCompleto());
         setBounds(100, 100, 800, 500);
         setLocationRelativeTo(null);
@@ -104,7 +113,13 @@ public class HistorialPaciente extends JDialog {
         modelHistorial.setRowCount(0);
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-        ArrayList<Consulta> listaVisible = medicoLogueado.verHistorialPaciente(paciente);
+        ArrayList<Consulta> listaVisible;
+        
+        if (medicoLogueado == null) {
+            listaVisible = paciente.getHistorialConsultas();
+        } else {
+            listaVisible = medicoLogueado.verHistorialPaciente(paciente);
+        }
         
         for (Consulta c : listaVisible) {
             String diagnostico = (c.getDiagnostico() != null) ? c.getDiagnostico().getNombre() : "Sin Diagnóstico";
