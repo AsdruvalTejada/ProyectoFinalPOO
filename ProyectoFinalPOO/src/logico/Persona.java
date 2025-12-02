@@ -66,6 +66,7 @@ public abstract class Persona implements Serializable{
 		return id;
 	} 
 	
+	
 	public String getNombreCompleto() {
 		return this.name + " " + this.apellido;
 	}
