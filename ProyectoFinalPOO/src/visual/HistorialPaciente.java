@@ -3,12 +3,17 @@ package visual;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Color;
+import java.awt.Desktop; 
 import java.awt.Font;
+import java.awt.event.ActionEvent; 
+import java.awt.event.ActionListener; 
+import java.io.File; 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane; 
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -18,6 +23,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import logico.Consulta;
+import logico.GeneradorReportes; 
 import logico.Medico;
 import logico.Paciente;
 import logico.Vacuna;
@@ -59,7 +65,7 @@ public class HistorialPaciente extends JDialog {
         JPanel panelDatos = new JPanel();
         panelDatos.setBackground(Color.WHITE);
         panelDatos.setBorder(new TitledBorder(null, "Datos del Paciente", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-        panelDatos.setBounds(10, 11, 764, 80);
+        panelDatos.setBounds(10, 11, 764, 85); 
         contentPanel.add(panelDatos);
         panelDatos.setLayout(null);
         
@@ -81,11 +87,23 @@ public class HistorialPaciente extends JDialog {
 
         JButton btnVerVacunas = new JButton("Ver Vacunas");
         btnVerVacunas.addActionListener(e -> mostrarVacunas());
-        btnVerVacunas.setBounds(600, 20, 120, 30);
+        btnVerVacunas.setBounds(600, 15, 140, 25);
         panelDatos.add(btnVerVacunas);
 
+        JButton btnExportarPDF = new JButton("Exportar PDF");
+        btnExportarPDF.setBackground(new Color(220, 53, 69));
+        btnExportarPDF.setForeground(Color.WHITE);
+        btnExportarPDF.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        btnExportarPDF.setBounds(600, 45, 140, 25); 
+        btnExportarPDF.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                exportarHistorialAPdf();
+            }
+        });
+        panelDatos.add(btnExportarPDF);
+
         JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setBounds(10, 100, 764, 320);
+        scrollPane.setBounds(10, 105, 764, 315); 
         contentPanel.add(scrollPane);
         
         String[] headers = {"Fecha", "ID Consulta", "Médico", "Diagnóstico", "Tratamiento"};
@@ -142,5 +160,31 @@ public class HistorialPaciente extends JDialog {
             sb.append("• ").append(v.getNombre()).append("\n");
         }
         javax.swing.JOptionPane.showMessageDialog(this, sb.toString());
+    }
+    
+    private void exportarHistorialAPdf() {
+        try {
+
+            String nombreArchivo = "Historial_" + paciente.getId() + ".pdf";
+            String rutaTemporal = System.getProperty("java.io.tmpdir") + nombreArchivo;
+            
+            File archivoPDF = new File(rutaTemporal);
+           
+            boolean exito = GeneradorReportes.generarHistorialPDF(paciente, rutaTemporal);
+            
+            if (exito) {
+                if (Desktop.isDesktopSupported()) {
+                    Desktop.getDesktop().open(archivoPDF);
+                } else {
+                    JOptionPane.showMessageDialog(this, "PDF generado en: " + rutaTemporal + "\nPero no se pudo abrir automáticamente.");
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al generar el documento PDF.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al intentar abrir el archivo.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }

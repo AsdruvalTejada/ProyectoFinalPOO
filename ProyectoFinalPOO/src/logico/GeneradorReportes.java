@@ -102,9 +102,6 @@ public class GeneradorReportes {
         }
     }
 
-    /**
-     * Genera el PDF de Vacunación
-     */
     public static void generarReporteVacunacion(String rutaArchivo) {
         Document documento = new Document();
 
@@ -114,13 +111,11 @@ public class GeneradorReportes {
 
             agregarTitulo(documento, "Reporte de Estado de Vacunación");
 
-            // Datos
             Map<String, Integer> reporte = SistemaGestion.getInstance().getReporteVacunacion();
             DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-            // Procesar datos para gráfico de barras
             for (Map.Entry<String, Integer> entry : reporte.entrySet()) {
-                String key = entry.getKey(); // Ej: "Polio - Aplicadas"
+                String key = entry.getKey(); 
                 int valor = entry.getValue();
                 
                 String[] partes = key.split(" - ");
@@ -131,7 +126,6 @@ public class GeneradorReportes {
                 }
             }
 
-            // Gráfico de Barras
             JFreeChart chart = ChartFactory.createBarChart(
                     "Cobertura de Vacunación", 
                     "Vacuna", "Cantidad", 
@@ -149,8 +143,6 @@ public class GeneradorReportes {
             documento.add(imagenGrafico);
 
             documento.add(Chunk.NEWLINE);
-
-            // Tabla
             PdfPTable tabla = new PdfPTable(2);
             tabla.setWidthPercentage(80);
             agregarCeldaHeader(tabla, "Concepto");
@@ -169,8 +161,6 @@ public class GeneradorReportes {
             e.printStackTrace();
         }
     }
-
-    // --- Métodos Auxiliares para no repetir código ---
     
     private static void agregarTitulo(Document doc, String texto) throws Exception {
         Paragraph titulo = new Paragraph(texto, FUENTE_TITULO);
@@ -196,5 +186,77 @@ public class GeneradorReportes {
         Paragraph pie = new Paragraph("Sistema de Gestión Clínica © 2025", FontFactory.getFont(FontFactory.HELVETICA_OBLIQUE, 10, BaseColor.GRAY));
         pie.setAlignment(Element.ALIGN_CENTER);
         doc.add(pie);
+    }
+    public static boolean generarHistorialPDF(Paciente paciente, String rutaDestino) {
+        Document documento = new Document();
+
+        try {
+            PdfWriter.getInstance(documento, new FileOutputStream(rutaDestino));
+            documento.open();
+
+            agregarTitulo(documento, "HISTORIAL CLÍNICO DEL PACIENTE");
+
+            documento.add(new Paragraph("Datos Personales:", FUENTE_SUBTITULO));
+            documento.add(new Paragraph("Nombre: " + paciente.getNombreCompleto(), FUENTE_NORMAL));
+            documento.add(new Paragraph("Cédula/ID: " + paciente.getId(), FUENTE_NORMAL));
+            documento.add(new Paragraph("Edad: " + paciente.getEdad() + " años", FUENTE_NORMAL));
+            documento.add(new Paragraph("Tipo de Sangre: " + paciente.getTipoSangre(), FUENTE_NORMAL));
+
+            String contacto = (paciente.getContacto() != null) ? paciente.getContacto() : "No registrado";
+            documento.add(new Paragraph("Contacto: " + contacto, FUENTE_NORMAL));
+            documento.add(new Paragraph("Estatura: " + paciente.getEstatura() + " m", FUENTE_NORMAL));
+            
+            documento.add(Chunk.NEWLINE);
+            documento.add(Chunk.NEWLINE);
+
+            documento.add(new Paragraph("Registro de Consultas:", FUENTE_SUBTITULO));
+            documento.add(Chunk.NEWLINE);
+
+            PdfPTable tabla = new PdfPTable(5);
+            tabla.setWidthPercentage(100);
+            tabla.setWidths(new float[]{2f, 1.5f, 2.5f, 2.5f, 3f}); 
+
+            agregarCeldaHeader(tabla, "Fecha");
+            agregarCeldaHeader(tabla, "ID");
+            agregarCeldaHeader(tabla, "Médico");
+            agregarCeldaHeader(tabla, "Diagnóstico");
+            agregarCeldaHeader(tabla, "Tratamiento");
+
+            SimpleDateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
+            ArrayList<Consulta> historial = paciente.getHistorialConsultas();
+
+            if (historial.isEmpty()) {
+                PdfPCell celdaVacia = new PdfPCell(new Phrase("Sin registros médicos.", FUENTE_NORMAL));
+                celdaVacia.setColspan(5);
+                celdaVacia.setHorizontalAlignment(Element.ALIGN_CENTER);
+                celdaVacia.setPadding(10);
+                tabla.addCell(celdaVacia);
+            } else {
+                for (Consulta c : historial) {
+                    
+                    Date fechaDate = java.sql.Timestamp.valueOf(c.getFechaConsulta());
+                    
+                    tabla.addCell(new Phrase(fmt.format(fechaDate), FUENTE_NORMAL));
+                    tabla.addCell(new Phrase(c.getId(), FUENTE_NORMAL));
+                    tabla.addCell(new Phrase(c.getMedico().getNombreCompleto(), FUENTE_NORMAL));
+                    
+                    String diag = (c.getDiagnostico() != null) ? c.getDiagnostico().getNombre() : "N/A";
+                    tabla.addCell(new Phrase(diag, FUENTE_NORMAL));
+                    
+                    String trat = (c.getTratamiento() != null) ? c.getTratamiento() : "N/A";
+                    tabla.addCell(new Phrase(trat, FUENTE_NORMAL));
+                }
+            }
+
+            documento.add(tabla);
+            agregarPiePagina(documento);
+            
+            documento.close();
+            return true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

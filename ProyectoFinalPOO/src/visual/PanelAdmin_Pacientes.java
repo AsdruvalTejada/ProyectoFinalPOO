@@ -73,7 +73,7 @@ public class PanelAdmin_Pacientes extends JPanel {
         add(pnlBotones, BorderLayout.SOUTH);
 
         JButton btnNuevo = new JButton("Añadir Paciente"); 
-        estilizarBoton(btnNuevo, new Color(86, 223, 207)); 
+        estilizarBoton(btnNuevo, new Color(0, 52, 102)); 
         btnNuevo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                  FormRegPaciente form = new FormRegPaciente(null);
@@ -96,8 +96,8 @@ public class PanelAdmin_Pacientes extends JPanel {
         });
         pnlBotones.add(btnEditar);
         
-        JButton btnHistorial = new JButton("Ver Historial");
-        estilizarBoton(btnHistorial, new Color(13, 110, 253));
+        JButton btnHistorial = new JButton("Ver historial");
+        estilizarBoton(btnHistorial, new Color(0, 52, 102));
         btnHistorial.addActionListener(e -> verHistorialPaciente());
         pnlBotones.add(btnHistorial);
         

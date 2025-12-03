@@ -62,7 +62,7 @@ public class PanelAdmin_Catalogos extends JPanel {
         
         JButton btnEditEnfermedad = new JButton("Editar");
         estilizarBoton(btnEditEnfermedad, colorAccent);
-        btnEditEnfermedad.setForeground(Color.BLACK);
+        btnEditEnfermedad.setForeground(Color.WHITE);
         btnEditEnfermedad.addActionListener(e -> editarEnfermedad());
         
         JButton btnDelEnfermedad = new JButton("Eliminar");

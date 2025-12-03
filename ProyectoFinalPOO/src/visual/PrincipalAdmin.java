@@ -35,6 +35,7 @@ public class PrincipalAdmin extends JFrame {
     private Color COLOR_BACKGROUND = new Color(248, 249, 250);
     private Color COLOR_TEXT_LIGHT = Color.WHITE;
     private Color COLOR_ACCENT = new Color(86, 223, 207);
+    private Color colorito = new Color(0, 52, 102);
 
     public PrincipalAdmin(Usuario user) {
         
@@ -121,12 +122,12 @@ public class PrincipalAdmin extends JFrame {
         pnlMainContent.setBorder(new EmptyBorder(10, 10, 10, 10));
         contentPane.add(pnlMainContent, BorderLayout.CENTER);
 
-        JPanel panelCitas = new PanelAdmin_Citas(COLOR_ACCENT); 
-        JPanel panelPacientes = new PanelAdmin_Pacientes(COLOR_ACCENT);
-        JPanel panelPersonal = new PanelAdmin_Personal(COLOR_ACCENT);
-        JPanel panelUsuarios = new PanelAdmin_Usuarios(COLOR_ACCENT);
-        JPanel panelReportes = new PanelAdmin_Reportes(COLOR_ACCENT);
-        JPanel panelCatalogos = new PanelAdmin_Catalogos(COLOR_ACCENT); 
+        JPanel panelCitas = new PanelAdmin_Citas(colorito); 
+        JPanel panelPacientes = new PanelAdmin_Pacientes(colorito);
+        JPanel panelPersonal = new PanelAdmin_Personal(colorito);
+        JPanel panelUsuarios = new PanelAdmin_Usuarios(colorito);
+        JPanel panelReportes = new PanelAdmin_Reportes(colorito);
+        JPanel panelCatalogos = new PanelAdmin_Catalogos(colorito); 
         
         pnlMainContent.add(panelCitas, "citas");
         pnlMainContent.add(panelPacientes, "pacientes");

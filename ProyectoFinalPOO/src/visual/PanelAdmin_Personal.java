@@ -91,7 +91,7 @@ public class PanelAdmin_Personal extends JPanel {
 		pnlBotones.add(lblSep);
 
 		JButton btnEditar = new JButton("Modificar");
-		estilizarBoton(btnEditar, new Color(86, 223, 207));
+		estilizarBoton(btnEditar, new Color(0, 52, 102));
 		btnEditar.setForeground(Color.WHITE);
 		btnEditar.addActionListener(e -> modificarSeleccionado());
 		pnlBotones.add(btnEditar);
