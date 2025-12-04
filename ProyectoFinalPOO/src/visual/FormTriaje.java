@@ -385,7 +385,8 @@ public class FormTriaje extends JDialog {
         }
         
         Consulta nuevaConsulta = SistemaGestion.getInstance().iniciarConsulta(
-                idCita, 
+                idCita,
+                nombreFinal,
                 apellidoFinal, 
                 nacimiento, 
                 sexo, 

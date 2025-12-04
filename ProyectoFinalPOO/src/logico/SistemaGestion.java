@@ -338,7 +338,7 @@ public class SistemaGestion implements Serializable{
         return realizado;
     }
 
-    public Consulta iniciarConsulta(String idCita, String apellido, LocalDate fechaNacimiento, 
+    public Consulta iniciarConsulta(String idCita, String nombre, String apellido, LocalDate fechaNacimiento, 
                                     String sexo, String contacto, String sintomas, 
                                     String tipoSangre, float estatura, float peso, String presionArterial) {
         Consulta conAux = null;
@@ -348,7 +348,7 @@ public class SistemaGestion implements Serializable{
             Paciente pac = buscarPacientePorId(citaAux.getIdPaciente());
             
             if(pac == null){
-                pac = new Paciente(citaAux.getIdPaciente(), citaAux.getNameVisitante(), apellido, 
+                pac = new Paciente(citaAux.getIdPaciente(), nombre, apellido, 
                                    fechaNacimiento, sexo, contacto, tipoSangre, estatura);
                 pac.inicializarRegistroVacunas(this.catalogoVacunas);
                 registrarPaciente(pac);
